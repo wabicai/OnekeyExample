@@ -5,7 +5,7 @@ import { useDeviceStore } from "../store/deviceStore";
 import { CheckCircle, XCircle, Usb, Wifi } from "lucide-react";
 import TransportSwitcher from "../components/common/TransportSwitcher";
 import DeviceIcon from "../components/device/DeviceIcon";
-
+import deviceList from "../assets/device-list2.png";
 export default function IndexPage() {
   const { t } = useTranslation();
   const {
@@ -236,7 +236,7 @@ export default function IndexPage() {
                 <CardContent className="p-8 h-full flex flex-col items-center justify-center">
                   <div className="relative flex-1 flex items-center justify-center">
                     <img
-                      src="/assets/device-list2.png"
+                      src={deviceList}
                       alt="OneKey Devices"
                       className="w-full h-auto max-w-2xl mx-auto drop-shadow-lg"
                     />
