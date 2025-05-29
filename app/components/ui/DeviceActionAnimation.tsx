@@ -1,5 +1,20 @@
 import React from "react";
 import Lottie from "lottie-react";
+import confirmOnClassic from "../../assets/animation/confirm-on-classic.json";
+import confirmOnMini from "../../assets/animation/confirm-on-mini.json";
+import confirmOnProLight from "../../assets/animation/confirm-on-pro-light.json";
+import confirmOnProDark from "../../assets/animation/confirm-on-pro-dark.json";
+import confirmOnTouch from "../../assets/animation/confirm-on-touch.json";
+import enterPassphraseOnClassic from "../../assets/animation/enter-passphrase-on-classic.json";
+import enterPassphraseOnMini from "../../assets/animation/enter-passphrase-on-mini.json";
+import enterPassphraseOnProLight from "../../assets/animation/enter-passphrase-on-pro-light.json";
+import enterPassphraseOnProDark from "../../assets/animation/enter-passphrase-on-pro-dark.json";
+import enterPassphraseOnTouch from "../../assets/animation/enter-passphrase-on-touch.json";
+import enterPinOnClassic from "../../assets/animation/enter-pin-on-classic.json";
+import enterPinOnMini from "../../assets/animation/enter-pin-on-mini.json";
+import enterPinOnProLight from "../../assets/animation/enter-pin-on-pro-light.json";
+import enterPinOnProDark from "../../assets/animation/enter-pin-on-pro-dark.json";
+import enterPinOnTouch from "../../assets/animation/enter-pin-on-touch.json";
 
 // 动效类型
 export type AnimationType = "confirm" | "passphrase" | "inputPin";
@@ -45,16 +60,17 @@ const DeviceActionAnimation: React.FC<DeviceActionAnimationProps> = ({
         case "confirm":
           switch (deviceModel) {
             case "classic":
-              animationFile = "/assets/animation/confirm-on-classic.json";
+              animationFile = confirmOnClassic;
               break;
             case "mini":
-              animationFile = "/assets/animation/confirm-on-mini.json";
+              animationFile = confirmOnMini;
               break;
             case "pro":
-              animationFile = `/assets/animation/confirm-on-pro-${theme}.json`;
+              animationFile =
+                theme === "light" ? confirmOnProLight : confirmOnProDark;
               break;
             case "touch":
-              animationFile = "/assets/animation/confirm-on-touch.json";
+              animationFile = confirmOnTouch;
               break;
           }
           break;
@@ -62,18 +78,19 @@ const DeviceActionAnimation: React.FC<DeviceActionAnimationProps> = ({
         case "passphrase":
           switch (deviceModel) {
             case "classic":
-              animationFile =
-                "/assets/animation/enter-passphrase-on-classic.json";
+              animationFile = enterPassphraseOnClassic;
               break;
             case "mini":
-              animationFile = "/assets/animation/enter-passphrase-on-mini.json";
+              animationFile = enterPassphraseOnMini;
               break;
             case "pro":
-              animationFile = `/assets/animation/enter-passphrase-on-pro-${theme}.json`;
+              animationFile =
+                theme === "light"
+                  ? enterPassphraseOnProLight
+                  : enterPassphraseOnProDark;
               break;
             case "touch":
-              animationFile =
-                "/assets/animation/enter-passphrase-on-touch.json";
+              animationFile = enterPassphraseOnTouch;
               break;
           }
           break;
@@ -81,16 +98,17 @@ const DeviceActionAnimation: React.FC<DeviceActionAnimationProps> = ({
         case "inputPin":
           switch (deviceModel) {
             case "classic":
-              animationFile = "/assets/animation/enter-pin-on-classic.json";
+              animationFile = enterPinOnClassic;
               break;
             case "mini":
-              animationFile = "/assets/animation/enter-pin-on-mini.json";
+              animationFile = enterPinOnMini;
               break;
             case "pro":
-              animationFile = `/assets/animation/enter-pin-on-pro-${theme}.json`;
+              animationFile =
+                theme === "light" ? enterPinOnProLight : enterPinOnProDark;
               break;
             case "touch":
-              animationFile = "/assets/animation/enter-pin-on-touch.json";
+              animationFile = enterPinOnTouch;
               break;
           }
           break;

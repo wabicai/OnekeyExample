@@ -1,4 +1,10 @@
 import React from "react";
+import touch from "../../assets/deviceMockup/touch.png";
+import proBlack from "../../assets/deviceMockup/pro-black.png";
+import proWhite from "../../assets/deviceMockup/pro-white.png";
+import mini from "../../assets/deviceMockup/mini.png";
+import pure from "../../assets/deviceMockup/pure.png";
+import classic1s from "../../assets/deviceMockup/classic1s.png";
 
 interface DeviceIconProps {
   deviceType?: string;
@@ -8,13 +14,13 @@ interface DeviceIconProps {
 
 // 设备类型映射到图片路径
 const deviceImageMap: Record<string, string> = {
-  touch: "/assets/deviceMockup/touch.png",
-  pro: "/assets/deviceMockup/pro-black.png",
-  "pro-white": "/assets/deviceMockup/pro-white.png",
-  mini: "/assets/deviceMockup/mini.png",
-  pure: "/assets/deviceMockup/pure.png",
-  classic1s: "/assets/deviceMockup/classic1s.png",
-  default: "/assets/deviceMockup/pro-black.png",
+  touch: touch,
+  pro: proBlack,
+  "pro-white": proWhite,
+  mini: mini,
+  pure: pure,
+  classic1s: classic1s,
+  default: proBlack,
 };
 
 export const DeviceIcon: React.FC<DeviceIconProps> = ({

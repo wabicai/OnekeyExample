@@ -10,6 +10,9 @@ import { Moon, Sun, Globe, ExternalLink } from "lucide-react";
 import { useTheme } from "../hooks/use-theme";
 import { useTranslation } from "react-i18next";
 
+// 导入GitHub图标
+import githubIcon from "~/assets/gitHub.svg";
+
 export function SiteHeader() {
   const { toggleTheme } = useTheme();
   const { t, i18n } = useTranslation();
@@ -88,7 +91,7 @@ export function SiteHeader() {
                 className="gap-2"
               >
                 <span className="text-sm">GitHub</span>
-                <img src="/icon/gitHub.svg" alt="GitHub" className="h-5 w-5" />
+                <img src={githubIcon} alt="GitHub" className="h-5 w-5" />
               </a>
             </Button>
           </div>

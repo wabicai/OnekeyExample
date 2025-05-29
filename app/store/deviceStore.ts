@@ -1,12 +1,18 @@
 import { create } from "zustand";
 import { DeviceInfo, LogEntry, ApiResponse } from "../types/hardware";
 import { TransportType, DeviceActionType } from "../services/hardwareService";
-import { 
-  isClassicModelDevice, 
+import {
+  isClassicModelDevice,
   isTouchModelDevice,
 } from "../utils/deviceTypeUtils";
 import type { IDeviceType, Features } from "@onekeyfe/hd-core";
-import { getDeviceFirmwareVersion, getDeviceBLEFirmwareVersion, getDeviceBootloaderVersion,getDeviceLabel, getDeviceUUID} from "@onekeyfe/hd-core";
+import {
+  getDeviceFirmwareVersion,
+  getDeviceBLEFirmwareVersion,
+  getDeviceBootloaderVersion,
+  getDeviceLabel,
+  getDeviceUUID,
+} from "@onekeyfe/hd-core";
 
 // 设备动作状态
 export interface DeviceActionState {

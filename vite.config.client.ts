@@ -44,8 +44,9 @@ function nodePolyfillPlugin() {
 
 export default defineConfig({
   root: process.cwd(),
-  // GitHub Pages base path - 根据你的仓库名修改
+  // 根据环境设置base path
   base: process.env.NODE_ENV === "production" ? "/OnekeyExample/" : "/",
+
   plugins: [react(), tsconfigPaths(), nodePolyfillPlugin()],
 
   define: {
