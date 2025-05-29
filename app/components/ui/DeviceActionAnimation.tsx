@@ -25,6 +25,9 @@ export type DeviceModel = "classic" | "mini" | "pro" | "touch";
 // 主题类型（适用于Pro系列）
 export type ThemeType = "light" | "dark";
 
+// Lottie动画数据类型
+type LottieAnimationData = Record<string, any>;
+
 interface DeviceActionAnimationProps {
   action: AnimationType;
   deviceModel: DeviceModel;
@@ -44,100 +47,52 @@ const DeviceActionAnimation: React.FC<DeviceActionAnimationProps> = ({
   className = "",
   onComplete,
 }) => {
-  const [animationData, setAnimationData] = React.useState(null);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  // 获取对应的动画数据
+  const getAnimationData = (): LottieAnimationData | null => {
+    switch (action) {
+      case "confirm":
+        switch (deviceModel) {
+          case "classic":
+            return confirmOnClassic;
+          case "mini":
+            return confirmOnMini;
+          case "pro":
+            return theme === "light" ? confirmOnProLight : confirmOnProDark;
+          case "touch":
+            return confirmOnTouch;
+        }
+        break;
 
-  // 动态导入lottie动效文件
-  const getAnimationData = React.useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
+      case "passphrase":
+        switch (deviceModel) {
+          case "classic":
+            return enterPassphraseOnClassic;
+          case "mini":
+            return enterPassphraseOnMini;
+          case "pro":
+            return theme === "light"
+              ? enterPassphraseOnProLight
+              : enterPassphraseOnProDark;
+          case "touch":
+            return enterPassphraseOnTouch;
+        }
+        break;
 
-      let animationFile = "";
-
-      switch (action) {
-        case "confirm":
-          switch (deviceModel) {
-            case "classic":
-              animationFile = confirmOnClassic;
-              break;
-            case "mini":
-              animationFile = confirmOnMini;
-              break;
-            case "pro":
-              animationFile =
-                theme === "light" ? confirmOnProLight : confirmOnProDark;
-              break;
-            case "touch":
-              animationFile = confirmOnTouch;
-              break;
-          }
-          break;
-
-        case "passphrase":
-          switch (deviceModel) {
-            case "classic":
-              animationFile = enterPassphraseOnClassic;
-              break;
-            case "mini":
-              animationFile = enterPassphraseOnMini;
-              break;
-            case "pro":
-              animationFile =
-                theme === "light"
-                  ? enterPassphraseOnProLight
-                  : enterPassphraseOnProDark;
-              break;
-            case "touch":
-              animationFile = enterPassphraseOnTouch;
-              break;
-          }
-          break;
-
-        case "inputPin":
-          switch (deviceModel) {
-            case "classic":
-              animationFile = enterPinOnClassic;
-              break;
-            case "mini":
-              animationFile = enterPinOnMini;
-              break;
-            case "pro":
-              animationFile =
-                theme === "light" ? enterPinOnProLight : enterPinOnProDark;
-              break;
-            case "touch":
-              animationFile = enterPinOnTouch;
-              break;
-          }
-          break;
-      }
-
-      if (!animationFile) {
-        throw new Error(
-          `No animation file found for ${action} on ${deviceModel}`
-        );
-      }
-
-      const response = await fetch(animationFile);
-      if (!response.ok) {
-        throw new Error(`Failed to load animation: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      setAnimationData(data);
-    } catch (error) {
-      console.error("Failed to load animation:", error);
-      setError(error instanceof Error ? error.message : "Unknown error");
-    } finally {
-      setIsLoading(false);
+      case "inputPin":
+        switch (deviceModel) {
+          case "classic":
+            return enterPinOnClassic;
+          case "mini":
+            return enterPinOnMini;
+          case "pro":
+            return theme === "light" ? enterPinOnProLight : enterPinOnProDark;
+          case "touch":
+            return enterPinOnTouch;
+        }
+        break;
     }
-  }, [action, deviceModel, theme]);
-
-  React.useEffect(() => {
-    getAnimationData();
-  }, [getAnimationData]);
+    return null;
+  };
 
   // 获取动效描述文本
   const getActionDescription = () => {
@@ -169,16 +124,7 @@ const DeviceActionAnimation: React.FC<DeviceActionAnimationProps> = ({
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className={`flex flex-col items-center justify-center ${className}`}>
-        <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mb-2"></div>
-        <p className="text-sm text-gray-600">加载动效中...</p>
-      </div>
-    );
-  }
-
-  if (error || !animationData) {
+  if (!getAnimationData()) {
     return (
       <div className={`flex flex-col items-center justify-center ${className}`}>
         <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
@@ -189,7 +135,6 @@ const DeviceActionAnimation: React.FC<DeviceActionAnimationProps> = ({
             {getDeviceName()}
           </p>
           <p className="text-xs text-gray-600">{getActionDescription()}</p>
-          {error && <p className="text-xs text-red-500 mt-2">动效加载失败</p>}
         </div>
       </div>
     );
@@ -199,7 +144,7 @@ const DeviceActionAnimation: React.FC<DeviceActionAnimationProps> = ({
     <div className={`flex flex-col items-center ${className}`}>
       <div className="w-full max-w-sm aspect-video overflow-hidden rounded-lg">
         <Lottie
-          animationData={animationData}
+          animationData={getAnimationData()}
           loop={loop}
           autoplay={autoplay}
           onComplete={onComplete}
