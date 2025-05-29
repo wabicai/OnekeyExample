@@ -1040,7 +1040,7 @@
   resolved "https://registry.yarnpkg.com/@onekeyfe/cross-inpage-provider-types/-/cross-inpage-provider-types-0.0.17.tgz#0c88c1a2febac44ec1600e0e59da732579cbd045"
   integrity sha512-QqjIPXQHb3UG9w79ujjL5L5Qd6oCrymQ/x2J2rYICtr56G6shHTmUvRZxAvne0ZsLv8UBGqZWbepVdnPipehYQ==
 
-"@onekeyfe/hd-core@^1.0.29", "@onekeyfe/hd-core@^1.0.31":
+"@onekeyfe/hd-core@^1.0.31":
   version "1.0.31"
   resolved "https://registry.yarnpkg.com/@onekeyfe/hd-core/-/hd-core-1.0.31.tgz#d1e3ee982101b66133043ec2dcc40972a006ec4f"
   integrity sha512-XouaWxECmXPT3oUOunDJwAyEC0mofdYahGqKQePjr1KvKV95mOOAssy9Pus7kyzqkfAFfwNlFxYD1It8hp3X3w==
@@ -1054,7 +1054,7 @@
     parse-uri "^1.0.7"
     semver "^7.3.7"
 
-"@onekeyfe/hd-shared@^1.0.31", "@onekeyfe/hd-shared@^1.0.31-alpha.0":
+"@onekeyfe/hd-shared@^1.0.31":
   version "1.0.31"
   resolved "https://registry.yarnpkg.com/@onekeyfe/hd-shared/-/hd-shared-1.0.31.tgz#b6bc54421b063645cfe3947a74c451581dd5b232"
   integrity sha512-yHg6GSvNaKyBXag4ML3b9N8hJLMZyl1kiJOnOtlr2jPBB4SsE80eHmswzLGG7VSg6l+kOEoaJNBEIh6UnhxUUg==
@@ -1086,7 +1086,7 @@
     long "^4.0.0"
     protobufjs "^6.11.2"
 
-"@onekeyfe/hd-web-sdk@^1.0.29":
+"@onekeyfe/hd-web-sdk@^1.0.31":
   version "1.0.31"
   resolved "https://registry.yarnpkg.com/@onekeyfe/hd-web-sdk/-/hd-web-sdk-1.0.31.tgz#10f7f91f517bddbd5f65aebab842806d82da5fc7"
   integrity sha512-ofz0YoCrK/+kXDpl3GGAsl+2GySmHXyo5fOhfHlvDVMWgB01nJ6cv1xTWJt9SR+2umjg1AcvwjFaFg0PWibeKw==
