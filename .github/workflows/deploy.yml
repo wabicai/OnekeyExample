@@ -1,0 +1,71 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Debug file structure
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "List app directory:"
+          ls -la app/
+          echo "List app/components directory:"
+          ls -la app/components/
+          echo "List app/components/ui directory:"
+          ls -la app/components/ui/
+          echo "Check if Toaster.tsx exists:"
+          ls -la app/components/ui/Toaster.tsx || echo "Toaster.tsx not found"
+
+      - name: Clean and install dependencies
+        run: |
+          rm -rf node_modules package-lock.json .npm
+          npm cache clean --force
+          npm install --legacy-peer-deps
+
+      - name: Verify installation
+        run: |
+          echo "Checking if Toaster exists after install:"
+          ls -la app/components/ui/Toaster.tsx
+          echo "Node modules check:"
+          ls node_modules/@radix-ui/ | grep toast || echo "No toast package found"
+
+      - name: Build
+        run: npm run build:gh-pages
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "./dist"
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,339 @@
+# OneKey Hardware Wallet Demo - Cursor 开发规范
+
+## 🎯 核心开发原则（必须严格遵循）
+
+### 1. 🎨 shadcn/ui 优先原则
+- **强制要求**: 所有UI组件必须使用shadcn/ui，绝不自定义基础组件
+- **代码简化**: 通过shadcn/ui组件减少UI逻辑复杂性
+- **一致性**: 确保整个项目UI风格统一，降低维护成本
+
+### 2. 🚀 Remix客户端渲染架构
+- **框架模式**: Remix SPA Mode，纯客户端渲染
+- **路由系统**: 使用react-router自定义路由方式
+- **页面结构**: 每个路由文件为独立的客户端页面组件
+
+### 3. 📚 hardware-js-sdk参考实现
+- **代码参考**: 编写硬件连接代码时，必须参考hardware-js-sdk中的实现
+- **示例优先**: 优先查看packages/connect-examples/中的示例代码
+- **API调用**: 严格按照SDK的API接口和错误处理模式
+
+### 4. 👩‍🎨 设计师视角的UI/UX
+- **用户体验**: 始终从用户角度思考，简化操作流程
+- **优雅美观**: 界面设计要优雅、现代、符合OneKey品牌
+- **交互流畅**: 关注操作反馈、加载状态、错误提示的用户友好性
+
+## 🛠 技术栈
+- **框架**: Remix SPA Mode + React 18 + TypeScript
+- **样式**: Tailwind CSS + shadcn/ui 组件库  
+- **状态**: Zustand + react-i18next
+- **硬件**: OneKey Connect SDK (WebUSB/JSBridge/WebBLE)
+
+## 编码原则
+- 所有代码必须使用TypeScript编写
+- 对于类型定义，不要使用unknown. 对于类型报错，请直接定义准确的类型
+
+## 📁 项目架构（重构后）
+```
+app/
+├── components/
+│   ├── ui/              # shadcn/ui 组件（必须使用）
+│   ├── common/          # 通用组件（已优化）
+│   ├── device/          # 设备相关组件
+│   └── layout/          # 布局组件
+├── hooks/               # 自定义Hook（重构新增）
+├── lib/                 # 工具函数库（重构新增）
+├── routes/              # 页面路由（已优化）
+├── services/            # 硬件服务
+├── store/               # Zustand 状态
+└── types/               # TypeScript 类型
+```
+
+## 🎨 OneKey 设计系统（强制执行）
+
+### 品牌色彩
+```tsx
+// OneKey 主题色（必须使用）
+primary: "#82f072"
+
+// 辅助色彩系统
+secondary: "#6fd85a" | "#5bb848"  // 主题色深浅变化
+accent: "#4a9635"                // 强调色
+
+// 基础色彩
+white: "#ffffff" | "#fefefe"
+gray: {
+  50: "#f9fafb",
+  100: "#f3f4f6", 
+  200: "#e5e7eb",
+  300: "#d1d5db",
+  400: "#9ca3af",
+  500: "#6b7280",
+  600: "#4b5563",
+  700: "#374151",
+  800: "#1f2937",
+  900: "#111827"
+}
+
+// 纯净卡片设计（新标准）
+"bg-card border border-border/50 shadow-sm rounded-xl"
+```
+
+### 标准组件模式（必须遵循）
+```tsx
+// 交互动效 - 统一标准
+className="transition-all duration-200 hover:scale-105 hover:shadow-lg"
+
+// 状态徽章 - 主题色系
+<Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+
+// 文本颜色规范
+text-foreground     // 主要文本
+text-muted-foreground   // 次要文本  
+text-muted-foreground   // 提示文本
+```
+
+## 🔧 必须使用的组件
+
+### shadcn/ui 组件（优先级最高）
+```tsx
+// 基础组件 - 必须使用，简化UI逻辑
+import { Button } from "~/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import { Badge } from "~/components/ui/badge"
+import { Input } from "~/components/ui/input"
+import { Checkbox } from "~/components/ui/checkbox"
+import { Separator } from "~/components/ui/separator"
+import { Select, SelectContent, SelectItem, SelectTrigger } from "~/components/ui/select"
+
+// 导航和布局 - 必须使用
+import { Sidebar, SidebarContent, SidebarProvider } from "~/components/ui/sidebar"
+
+// 反馈组件 - 必须使用
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog"
+import { useToast } from "~/components/ui/use-toast"
+import { Skeleton } from "~/components/ui/skeleton"
+import { Alert, AlertDescription } from "~/components/ui/alert"
+```
+
+### 已优化的公共组件（必须复用）
+```tsx
+// 通用组件 - 优先使用已有的
+import { LoadingSpinner } from "~/components/common/LoadingSpinner"
+import { PageLayout } from "~/components/common/PageLayout"
+import { CategoryBadge } from "~/components/common/CategoryBadge"
+import { DeviceConnectionAlert } from "~/components/common/DeviceConnectionAlert"
+import { ParameterInput } from "~/components/common/ParameterInput"
+import { ExecutionStatus } from "~/components/common/ExecutionStatus"
+
+// 自定义Hook - 必须使用
+import { useTemplateRegistry } from "~/hooks/useTemplateRegistry"
+import { useMethodExecution } from "~/hooks/useMethodExecution"
+
+// 工具函数 - 必须使用
+import { getCategoryIcon, getCategoryColor, getCategoryDisplayName } from "~/lib/category-utils"
+```
+
+## 📋 严格开发约束
+
+### 1. 组件开发约束
+- ❌ **禁止**: 创建新的基础UI组件（Button, Input, Card等）
+- ❌ **禁止**: 重复实现已有的公共组件
+- ❌ **禁止**: 组件超过150行代码
+- ✅ **必须**: 使用shadcn/ui简化UI逻辑
+- ✅ **必须**: TypeScript接口完整定义
+- ✅ **必须**: 组件使用React.memo优化
+
+### 2. 样式约束
+- ❌ **禁止**: 自定义CSS文件
+- ❌ **禁止**: 内联样式对象
+- ❌ **禁止**: 非OneKey品牌色彩
+- ✅ **必须**: Tailwind CSS类名
+- ✅ **必须**: OneKey绿色主题
+- ✅ **必须**: 响应式设计 (sm:, md:, lg:)
+
+### 3. 路由和页面约束
+- ❌ **禁止**: 服务端渲染相关代码
+- ✅ **必须**: 使用react-router客户端路由
+- ✅ **必须**: 每个页面为独立的客户端组件
+- ✅ **必须**: 路由文件放在routes/目录下
+
+### 4. 硬件连接约束
+- ❌ **禁止**: 自定义硬件连接逻辑
+- ✅ **必须**: 参考hardware-js-sdk/packages/connect-examples/
+- ✅ **必须**: 使用SDK标准API和错误处理
+- ✅ **必须**: 遵循SDK的最佳实践
+
+### 5. UI/UX设计约束
+- ❌ **禁止**: 复杂的操作流程
+- ❌ **禁止**: 缺乏状态反馈的交互
+- ✅ **必须**: 简化用户操作步骤
+- ✅ **必须**: 提供清晰的视觉反馈
+- ✅ **必须**: 优雅美观的界面设计
+
+## 🔌 硬件连接规范
+
+### 必须参考的SDK示例
+```tsx
+// 参考 hardware-js-sdk/packages/connect-examples/
+// 标准连接模式
+import HardwareSDK from '@onekeyfe/hd-web-sdk';
+
+// 错误处理模式（参考SDK）
+try {
+  const result = await HardwareSDK.evmGetAddress({
+    path: "m/44'/60'/0'/0/0",
+    showOnOneKey: true
+  });
+  
+  if (result.success) {
+    toast({ title: t('device.connectSuccess'), variant: "default" });
+  } else {
+    toast({ 
+      title: t('device.connectFailed'), 
+      description: result.payload.error, 
+      variant: "destructive" 
+    });
+  }
+} catch (error) {
+  toast({ 
+    title: t('common.error'), 
+    description: error.message, 
+    variant: "destructive" 
+  });
+}
+```
+
+## 🎨 UI/UX设计原则
+
+### 用户体验优先
+- **操作简化**: 最多3步完成主要功能
+- **状态清晰**: 每个操作都有明确的视觉反馈
+- **错误友好**: 错误信息要用户友好，提供解决建议
+
+### OneKey 配色方案使用指导
+- **主题色 #82f072**: 仅用于主要操作按钮、重要状态指示、图标强调、边框点缀
+- **白色系**: 主要背景、卡片背景、次要按钮背景  
+- **灰色系**: 文本层次、边框、分割线、禁用状态、容器背景
+- **渐变禁用**: 禁止使用绿色渐变背景，保持纯净的白灰设计
+
+### 视觉设计原则
+- **层次清晰**: 使用灰色深浅和间距建立信息层次
+- **一致性**: 相同功能使用相同的交互模式和颜色
+- **简洁优雅**: 以白色为主，灰色为辅，绿色仅作点缀
+- **纯净设计**: 避免过度装饰，强调内容优先
+
+### 交互设计模式
+```tsx
+// 主要操作 - 使用主题色
+<Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+  连接设备
+</Button>
+
+// 次要操作 - 纯净背景
+<Button variant="outline" className="bg-background border-border text-foreground hover:bg-muted">
+  取消
+</Button>
+
+// 危险操作 - 红色系，保持一致性
+<Button variant="destructive" className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+  删除
+</Button>
+
+// 信息展示卡片 - 纯净设计
+<Card className="bg-card border border-border/50 shadow-sm">
+  <CardHeader className="border-b border-border">
+    <CardTitle className="text-foreground">设备信息</CardTitle>
+  </CardHeader>
+  <CardContent className="text-muted-foreground">
+    内容区域
+  </CardContent>
+</Card>
+
+// 状态指示 - 主题色点缀
+<Badge className="bg-primary/10 text-primary border-primary/20">
+  已连接
+</Badge>
+
+// 加载状态 - 优雅的用户反馈
+{isLoading ? (
+  <div className="flex items-center space-x-2">
+    <LoadingSpinner size="sm" className="text-primary" />
+    <span className="text-muted-foreground">{t('common.connecting')}</span>
+  </div>
+) : (
+  <Button className="bg-primary hover:bg-primary/90">连接设备</Button>
+)}
+
+// 分组和分割
+<Separator className="bg-border" />
+
+// 输入框
+<Input className="bg-background border-border focus:border-primary focus:ring-primary/20" />
+```
+
+## 🚀 Cursor 指令模板
+
+### 基础开发
+```
+"基于shadcn/ui创建[组件名]，参考hardware-js-sdk示例，遵循OneKey设计系统，注重用户体验"
+```
+
+### 页面开发
+```
+"创建客户端路由页面[页面名]，使用react-router，参考SDK连接示例，设计师视角优化UI/UX"
+```
+
+### 硬件功能实现
+```
+"参考hardware-js-sdk/packages/connect-examples/实现[功能]，使用shadcn/ui简化UI逻辑，优化用户操作流程"
+```
+
+## ⚡ 代码质量强制要求
+
+### TypeScript 严格模式
+- ✅ 无 `any` 类型
+- ✅ 完整接口定义
+- ✅ 严格空值检查
+- ✅ 函数返回类型明确
+
+### UI/UX质量要求
+- ✅ 操作流程不超过3步
+- ✅ 所有异步操作有加载状态
+- ✅ 错误信息用户友好
+- ✅ 界面美观现代
+
+### 硬件连接质量
+- ✅ 严格按照SDK示例实现
+- ✅ 完整的错误处理
+- ✅ 连接状态实时反馈
+- ✅ 断线重连机制
+
+## 🎯 开发决策优先级
+
+### 1. 用户体验 > 技术复杂度
+优先考虑用户操作的简便性和流畅性
+
+### 2. shadcn/ui > 自定义组件
+任何UI需求优先考虑shadcn/ui解决方案
+
+### 3. SDK示例 > 自创实现
+硬件功能严格参考官方SDK示例
+
+### 4. 设计美观 > 功能堆砌
+注重界面的优雅和视觉层次
+
+## 🚨 代码审查检查清单
+
+开发完成后必须确认：
+- [ ] 是否使用了shadcn/ui简化UI逻辑？
+- [ ] 是否为纯客户端渲染的react-router路由？
+- [ ] 是否参考了hardware-js-sdk的示例实现？
+- [ ] 是否从设计师视角优化了用户体验？
+- [ ] 操作流程是否足够简化（≤3步）？
+- [ ] 界面是否优雅美观符合OneKey品牌？
+- [ ] 是否有完整的状态反馈和错误处理？
+- [ ] 是否通过TypeScript类型检查？
+
+---
+
+**重要**: 这四个核心原则是项目开发的根本指导思想，任何代码都必须严格遵循。

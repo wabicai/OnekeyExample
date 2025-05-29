@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "hardware-sdk-reference": {
+      "command": "node",
+      "args": ["../hardware-js-sdk/scripts/mcp-server.js"],
+      "env": {
+        "PROJECT_ROOT": "../hardware-js-sdk"
+      }
+    },
+    "app-monorepo-reference": {
+      "command": "node", 
+      "args": ["../app-monorepo/scripts/mcp-server.js"],
+      "env": {
+        "PROJECT_ROOT": "../app-monorepo"
+      }
+    }
+  },
+  "contextInclude": [
+    "../hardware-js-sdk/packages/connect-examples/**/*.{ts,tsx,js,jsx}",
+    "../app-monorepo/packages/components/**/*.{ts,tsx}",
+    "../app-monorepo/packages/core/**/*.{ts,tsx}",
+    "../hardware-js-sdk/packages/hd-web-sdk/**/*.{ts,tsx}"
+  ],
+  "quickReference": {
+    "hardware-sdk": "../hardware-js-sdk/packages/",
+    "app-components": "../app-monorepo/packages/components/",
+    "examples": "../hardware-js-sdk/packages/connect-examples/"
+  }
+} 

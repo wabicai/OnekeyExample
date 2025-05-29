@@ -1,138 +1,257 @@
-import type { MetaFunction } from "@remix-run/node";
+import { Card, CardContent } from "../components/ui/Card";
+import { Badge } from "../components/ui/Badge";
+import { useTranslation } from "react-i18next";
+import { useDeviceStore } from "../store/deviceStore";
+import { CheckCircle, XCircle, Usb, Wifi } from "lucide-react";
+import TransportSwitcher from "../components/common/TransportSwitcher";
+import DeviceIcon from "../components/device/DeviceIcon";
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
-  ];
-};
+export default function IndexPage() {
+  const { t } = useTranslation();
+  const {
+    transportType,
+    currentDevice,
+    getCurrentDeviceLabel,
+    isCurrentDeviceClassicModel,
+    isConnecting,
+  } = useDeviceStore();
 
-export default function Index() {
+  const getTransportIcon = () => {
+    switch (transportType) {
+      case "webusb":
+        return <Usb className="h-4 w-4 text-primary" />;
+      case "jsbridge":
+        return <Wifi className="h-4 w-4 text-primary" />;
+      default:
+        return null;
+    }
+  };
+
+  const deviceDisplayName = currentDevice ? getCurrentDeviceLabel() : "";
+
   return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="flex flex-col items-center gap-16">
-        <header className="flex flex-col items-center gap-9">
-          <h1 className="leading text-2xl font-bold text-gray-800 dark:text-gray-100">
-            Welcome to <span className="sr-only">Remix</span>
+    <div className="min-h-screen bg-background flex justify-center pt-16 p-6">
+      <div className="container max-w-7xl mx-auto">
+        {/* 主标题区域 - 紧凑设计 */}
+        <div className="text-center space-y-3 mb-20">
+          <h1 className="text-3xl lg:text-4xl font-bold text-foreground">
+            OneKey Hardware Wallet SDK
           </h1>
-          <div className="h-[144px] w-[434px]">
-            <img
-              src="/logo-light.png"
-              alt="Remix"
-              className="block w-full dark:hidden"
-            />
-            <img
-              src="/logo-dark.png"
-              alt="Remix"
-              className="hidden w-full dark:block"
-            />
-          </div>
-        </header>
-        <nav className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-gray-200 p-6 dark:border-gray-700">
-          <p className="leading-6 text-gray-700 dark:text-gray-200">
-            What&apos;s next?
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            {t("home.subtitle")}
           </p>
-          <ul>
-            {resources.map(({ href, text, icon }) => (
-              <li key={href}>
-                <a
-                  className="group flex items-center gap-3 self-stretch p-3 leading-normal text-blue-700 hover:underline dark:text-blue-500"
-                  href={href}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {icon}
-                  {text}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        </div>
+
+        {/* 主要内容区域 - 等高布局 */}
+        <div className="grid lg:grid-cols-3 gap-8 items-stretch mb-12">
+          {/* 左侧：设备连接控制 */}
+          <div className="lg:col-span-1">
+            <Card className="bg-card border border-border/50 shadow-sm h-full relative">
+              {/* 卡片右上角加载指示器 */}
+              {isConnecting && (
+                <div className="absolute top-4 right-4 z-10 bg-white border border-gray-200 rounded-lg shadow-sm px-3 py-2">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-xs text-gray-600">连接中</span>
+                  </div>
+                </div>
+              )}
+
+              <CardContent className="p-8 h-full flex flex-col">
+                <div className="space-y-8 flex-1">
+                  {/* 连接状态 */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        {currentDevice ? (
+                          <CheckCircle className="h-5 w-5 text-primary" />
+                        ) : (
+                          <XCircle className="h-5 w-5 text-muted-foreground" />
+                        )}
+                        <div>
+                          <h3 className="font-semibold text-base text-foreground">
+                            {currentDevice
+                              ? t("device.connected")
+                              : t("device.disconnected")}
+                          </h3>
+                          <div className="flex items-center gap-2 mt-1">
+                            {getTransportIcon()}
+                            <p className="text-xs text-muted-foreground">
+                              {transportType || t("device.notSelected")}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <Badge
+                        variant={currentDevice ? "default" : "secondary"}
+                        className="text-xs px-2 py-1"
+                      >
+                        {currentDevice
+                          ? t("common.ready")
+                          : t("common.waiting")}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  {/* 连接方式选择 */}
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-base text-foreground">
+                      {t("device.selectConnection")}
+                    </h4>
+                    <TransportSwitcher />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* 右侧：设备详细信息展示 */}
+          <div className="lg:col-span-2">
+            {currentDevice ? (
+              /* 已连接设备的详细信息 */
+              <Card className="bg-card border border-border/50 shadow-sm h-full">
+                <CardContent className="p-8 h-full flex flex-col">
+                  {/* 设备主要信息 */}
+                  <div className="flex items-center gap-8 mb-8">
+                    <div className="flex-shrink-0">
+                      <DeviceIcon
+                        deviceType={currentDevice.deviceType}
+                        size="xl"
+                        className="drop-shadow-lg"
+                      />
+                    </div>
+                    <div className="flex-1 space-y-4">
+                      {/* 设备名称和状态 */}
+                      <div className="space-y-2">
+                        <h2 className="text-3xl font-light text-foreground">
+                          {deviceDisplayName}
+                        </h2>
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm text-muted-foreground">
+                            通过 {transportType} 连接
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* 关键信息网格 */}
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-1">
+                          <div className="text-xs text-muted-foreground uppercase tracking-wide">
+                            设备类型
+                          </div>
+                          <div className="text-sm font-medium">
+                            {currentDevice.deviceType}
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-xs text-muted-foreground uppercase tracking-wide">
+                            连接ID
+                          </div>
+                          <div className="text-sm font-mono">
+                            {currentDevice.connectId}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 分隔线 */}
+                  <div className="border-t border-border/50 mb-6"></div>
+
+                  {/* 设备信息 - 剩余空间填充 */}
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg mb-4 text-foreground">
+                      设备信息
+                    </h3>
+
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          UUID
+                        </span>
+                        <span className="text-xs font-mono">
+                          {currentDevice.uuid || "N/A"}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          deviceId
+                        </span>
+                        <span className="text-sm font-mono">
+                          {currentDevice.deviceId}
+                        </span>
+                      </div>
+                      {currentDevice.features && (
+                        <>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">
+                              固件版本
+                            </span>
+                            <span className="text-sm">
+                              {currentDevice.features.onekey_firmware_version}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">
+                              蓝牙版本
+                            </span>
+                            <span className="text-sm">
+                              {currentDevice.features.onekey_ble_version ||
+                                currentDevice.features.ble_ver ||
+                                "N/A"}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">
+                              Boot版本
+                            </span>
+                            <span className="text-sm">
+                              {currentDevice.features.onekey_boot_version ||
+                                "N/A"}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          网页输入pin
+                        </span>
+                        <Badge
+                          variant={
+                            isCurrentDeviceClassicModel()
+                              ? "default"
+                              : "secondary"
+                          }
+                        >
+                          {isCurrentDeviceClassicModel() ? "支持" : "不支持"}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              /* 未连接设备时显示设备列表图片 */
+              <Card className="bg-card border border-border/50 shadow-sm h-full">
+                <CardContent className="p-8 h-full flex flex-col items-center justify-center">
+                  <div className="relative flex-1 flex items-center justify-center">
+                    <img
+                      src="/assets/device-list2.png"
+                      alt="OneKey Devices"
+                      className="w-full h-auto max-w-2xl mx-auto drop-shadow-lg"
+                    />
+
+                    {/* 装饰性元素 */}
+                    <div className="absolute top-8 right-16 w-2 h-2 bg-primary/30 rounded-full animate-pulse" />
+                    <div className="absolute bottom-16 left-16 w-1.5 h-1.5 bg-primary/20 rounded-full animate-pulse delay-1000" />
+                    <div className="absolute top-1/3 left-8 w-1 h-1 bg-primary/40 rounded-full animate-pulse delay-500" />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
-
-const resources = [
-  {
-    href: "https://remix.run/start/quickstart",
-    text: "Quick Start (5 min)",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="20"
-        viewBox="0 0 20 20"
-        fill="none"
-        className="stroke-gray-600 group-hover:stroke-current dark:stroke-gray-300"
-      >
-        <path
-          d="M8.51851 12.0741L7.92592 18L15.6296 9.7037L11.4815 7.33333L12.0741 2L4.37036 10.2963L8.51851 12.0741Z"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-  },
-  {
-    href: "https://remix.run/start/tutorial",
-    text: "Tutorial (30 min)",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="20"
-        viewBox="0 0 20 20"
-        fill="none"
-        className="stroke-gray-600 group-hover:stroke-current dark:stroke-gray-300"
-      >
-        <path
-          d="M4.561 12.749L3.15503 14.1549M3.00811 8.99944H1.01978M3.15503 3.84489L4.561 5.2508M8.3107 1.70923L8.3107 3.69749M13.4655 3.84489L12.0595 5.2508M18.1868 17.0974L16.635 18.6491C16.4636 18.8205 16.1858 18.8205 16.0144 18.6491L13.568 16.2028C13.383 16.0178 13.0784 16.0347 12.915 16.239L11.2697 18.2956C11.047 18.5739 10.6029 18.4847 10.505 18.142L7.85215 8.85711C7.75756 8.52603 8.06365 8.21994 8.39472 8.31453L17.6796 10.9673C18.0223 11.0653 18.1115 11.5094 17.8332 11.7321L15.7766 13.3773C15.5723 13.5408 15.5554 13.8454 15.7404 14.0304L18.1868 16.4767C18.3582 16.6481 18.3582 16.926 18.1868 17.0974Z"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-  },
-  {
-    href: "https://remix.run/docs",
-    text: "Remix Docs",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="20"
-        viewBox="0 0 20 20"
-        fill="none"
-        className="stroke-gray-600 group-hover:stroke-current dark:stroke-gray-300"
-      >
-        <path
-          d="M9.99981 10.0751V9.99992M17.4688 17.4688C15.889 19.0485 11.2645 16.9853 7.13958 12.8604C3.01467 8.73546 0.951405 4.11091 2.53116 2.53116C4.11091 0.951405 8.73546 3.01467 12.8604 7.13958C16.9853 11.2645 19.0485 15.889 17.4688 17.4688ZM2.53132 17.4688C0.951566 15.8891 3.01483 11.2645 7.13974 7.13963C11.2647 3.01471 15.8892 0.951453 17.469 2.53121C19.0487 4.11096 16.9854 8.73551 12.8605 12.8604C8.73562 16.9853 4.11107 19.0486 2.53132 17.4688Z"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
-  },
-  {
-    href: "https://rmx.as/discord",
-    text: "Join Discord",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="20"
-        viewBox="0 0 24 20"
-        fill="none"
-        className="stroke-gray-600 group-hover:stroke-current dark:stroke-gray-300"
-      >
-        <path
-          d="M15.0686 1.25995L14.5477 1.17423L14.2913 1.63578C14.1754 1.84439 14.0545 2.08275 13.9422 2.31963C12.6461 2.16488 11.3406 2.16505 10.0445 2.32014C9.92822 2.08178 9.80478 1.84975 9.67412 1.62413L9.41449 1.17584L8.90333 1.25995C7.33547 1.51794 5.80717 1.99419 4.37748 2.66939L4.19 2.75793L4.07461 2.93019C1.23864 7.16437 0.46302 11.3053 0.838165 15.3924L0.868838 15.7266L1.13844 15.9264C2.81818 17.1714 4.68053 18.1233 6.68582 18.719L7.18892 18.8684L7.50166 18.4469C7.96179 17.8268 8.36504 17.1824 8.709 16.4944L8.71099 16.4904C10.8645 17.0471 13.128 17.0485 15.2821 16.4947C15.6261 17.1826 16.0293 17.8269 16.4892 18.4469L16.805 18.8725L17.3116 18.717C19.3056 18.105 21.1876 17.1751 22.8559 15.9238L23.1224 15.724L23.1528 15.3923C23.5873 10.6524 22.3579 6.53306 19.8947 2.90714L19.7759 2.73227L19.5833 2.64518C18.1437 1.99439 16.6386 1.51826 15.0686 1.25995ZM16.6074 10.7755L16.6074 10.7756C16.5934 11.6409 16.0212 12.1444 15.4783 12.1444C14.9297 12.1444 14.3493 11.6173 14.3493 10.7877C14.3493 9.94885 14.9378 9.41192 15.4783 9.41192C16.0471 9.41192 16.6209 9.93851 16.6074 10.7755ZM8.49373 12.1444C7.94513 12.1444 7.36471 11.6173 7.36471 10.7877C7.36471 9.94885 7.95323 9.41192 8.49373 9.41192C9.06038 9.41192 9.63892 9.93712 9.6417 10.7815C9.62517 11.6239 9.05462 12.1444 8.49373 12.1444Z"
-          strokeWidth="1.5"
-        />
-      </svg>
-    ),
-  },
-];
