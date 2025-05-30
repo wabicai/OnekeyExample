@@ -158,27 +158,18 @@ const ChainMethodsIndexPage: React.FC = () => {
                     <code className="font-mono font-semibold text-foreground">
                       {method.method}
                     </code>
-                    <div className="flex gap-1">
-                      {method.dangerous && (
-                        <div
-                          className="w-2 h-2 bg-red-500 rounded-full"
-                          title="Dangerous"
-                        />
-                      )}
-                      {method.requiresConfirmation && (
-                        <div
-                          className="w-2 h-2 bg-orange-500 rounded-full"
-                          title="Requires confirmation"
-                        />
-                      )}
-                    </div>
+                    {method.deprecated && (
+                      <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">
+                        Deprecated
+                      </span>
+                    )}
                   </div>
                   <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
                     {method.description}
                   </p>
                 </div>
                 <div className="text-xs text-muted-foreground ml-4">
-                  {method.category}
+                  {selectedChain.name}
                 </div>
               </div>
             ))}

@@ -21,7 +21,7 @@ const DeviceMethodExecutePage: React.FC = () => {
     null
   );
 
-  const { isLoading, error, getChainsByCategory } = useTemplateRegistry();
+  const { isLoading, error, getFunctionalChains } = useTemplateRegistry();
   const { executeMethod } = useMethodExecution({
     basePath: "/device-methods",
   });
@@ -41,19 +41,15 @@ const DeviceMethodExecutePage: React.FC = () => {
   useEffect(() => {
     if (!methodName) return;
 
-    // 获取设备方法
-    const deviceChains = getChainsByCategory("device");
-    const basicChains = getChainsByCategory("basic");
-    const allDeviceMethods = [
-      ...basicChains.flatMap((chain) => chain.methods),
-      ...deviceChains.flatMap((chain) => chain.methods),
-    ];
+    // 获取功能模块方法
+    const functionalChains = getFunctionalChains();
+    const allDeviceMethods = functionalChains.flatMap((chain) => chain.methods);
 
     const method = allDeviceMethods.find((m) => m.method === methodName);
     if (method) {
       setSelectedMethod(method);
     }
-  }, [methodName, getChainsByCategory]);
+  }, [methodName, getFunctionalChains]);
 
   // 加载状态
   if (isLoading) {

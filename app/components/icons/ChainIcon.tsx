@@ -94,11 +94,8 @@ export const ChainIcon: React.FC<ChainIconProps> = ({
   className = "",
   fallback,
 }) => {
-  // 规范化chainId
-  const normalizedChainId = chainId.toLowerCase().replace(/[_\s]/g, "-");
-
   // 直接从映射表获取图标
-  const iconSrc = CHAIN_ICON_MAP[normalizedChainId];
+  const iconSrc = CHAIN_ICON_MAP[chainId];
 
   // 如果没找到图标，显示fallback
   if (!iconSrc) {

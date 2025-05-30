@@ -15,7 +15,7 @@ const DeviceMethodsIndexPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { isLoading, error, getChainsByCategory } = useTemplateRegistry();
+  const { isLoading, error, getFunctionalChains } = useTemplateRegistry();
 
   // 加载状态
   if (isLoading) {
@@ -44,12 +44,14 @@ const DeviceMethodsIndexPage: React.FC = () => {
     );
   }
 
-  // 获取并按优先级排序方法（基本操作优先）
-  const deviceChains = getChainsByCategory("device");
-  const basicChains = getChainsByCategory("basic");
-
-  const basicMethods = basicChains.flatMap((chain) => chain.methods);
-  const deviceMethods = deviceChains.flatMap((chain) => chain.methods);
+  // 获取功能模块方法
+  const functionalChains = getFunctionalChains();
+  const basicMethods = functionalChains
+    .filter((chain) => chain.category === "basic")
+    .flatMap((chain) => chain.methods);
+  const deviceMethods = functionalChains
+    .filter((chain) => chain.category === "device")
+    .flatMap((chain) => chain.methods);
   const allDeviceMethods = [...basicMethods, ...deviceMethods];
 
   // 过滤方法
@@ -59,12 +61,16 @@ const DeviceMethodsIndexPage: React.FC = () => {
       method.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // 按类别分组
-  const basicFilteredMethods = filteredMethods.filter(
-    (method) => method.category === "basic" || method.category === "info"
+  // 按来源链分组（而不是method.category）
+  const basicFilteredMethods = basicMethods.filter(
+    (method) =>
+      method.method.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      method.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  const deviceFilteredMethods = filteredMethods.filter(
-    (method) => method.category === "device" || method.category === "management"
+  const deviceFilteredMethods = deviceMethods.filter(
+    (method) =>
+      method.method.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      method.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // 处理方法选择
@@ -138,27 +144,18 @@ const DeviceMethodsIndexPage: React.FC = () => {
                           <code className="font-mono font-semibold text-foreground">
                             {method.method}
                           </code>
-                          <div className="flex gap-1">
-                            {method.dangerous && (
-                              <div
-                                className="w-2 h-2 bg-red-500 rounded-full"
-                                title="Dangerous"
-                              />
-                            )}
-                            {method.requiresConfirmation && (
-                              <div
-                                className="w-2 h-2 bg-orange-500 rounded-full"
-                                title="Requires confirmation"
-                              />
-                            )}
-                          </div>
+                          {method.deprecated && (
+                            <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">
+                              Deprecated
+                            </span>
+                          )}
                         </div>
                         <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
                           {method.description}
                         </p>
                       </div>
                       <div className="text-xs text-muted-foreground ml-4">
-                        {method.category}
+                        Basic
                       </div>
                     </div>
                   ))}
@@ -192,27 +189,18 @@ const DeviceMethodsIndexPage: React.FC = () => {
                           <code className="font-mono font-semibold text-foreground">
                             {method.method}
                           </code>
-                          <div className="flex gap-1">
-                            {method.dangerous && (
-                              <div
-                                className="w-2 h-2 bg-red-500 rounded-full"
-                                title="Dangerous"
-                              />
-                            )}
-                            {method.requiresConfirmation && (
-                              <div
-                                className="w-2 h-2 bg-orange-500 rounded-full"
-                                title="Requires confirmation"
-                              />
-                            )}
-                          </div>
+                          {method.deprecated && (
+                            <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">
+                              Deprecated
+                            </span>
+                          )}
                         </div>
                         <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
                           {method.description}
                         </p>
                       </div>
                       <div className="text-xs text-muted-foreground ml-4">
-                        {method.category}
+                        Device
                       </div>
                     </div>
                   ))}

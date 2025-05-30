@@ -1,69 +1,41 @@
 import type { HardwareApiMethod } from "~/services/hardwareService";
 
-// 核心参数字段类型
-export interface ParameterField {
-  name: string;
-  type: "string" | "number" | "boolean" | "select" | "textarea";
-  required?: boolean;
-  default?: unknown;
-  placeholder?: string;
-  options?: string[];
-  description: string;
-  label?: string;
-  visible?: boolean;
-  editable?: boolean;
-  validation?: {
-    min?: number;
-    max?: number;
-    pattern?: string;
-  };
-}
-
+// 统一的方法预设类型
 export interface MethodPreset {
   title: string;
-  description?: string;
-  values: Record<string, unknown>;
-  visibleFields?: string[];
+  value: Record<string, unknown>;
 }
 
+// 统一的方法配置类型 - 直接基于原始数据格式
 export interface MethodConfig {
   method: HardwareApiMethod;
-  name: string;
   description: string;
-  category: MethodCategory;
-  parameters: ParameterField[];
   presets?: MethodPreset[];
-  dangerous?: boolean;
-  requiresConfirmation?: boolean;
+  deprecated?: boolean;
+  noConnIdReq?: boolean;
+  noDeviceIdReq?: boolean;
 }
 
-export interface ChainConfig {
-  id: string;
+// 链元数据类型
+export interface ChainMeta {
+  id: ChainCategory;
   name: string;
   description: string;
   icon: string;
   color: string;
-  category: ChainCategory;
+  category: Category;
+}
+
+// 完整的链配置类型
+export interface ChainConfig extends ChainMeta {
   methods: MethodConfig[];
 }
 
-// 分类类型
-export type MethodCategory =
-  | "address"
-  | "publicKey"
-  | "signing"
-  | "transaction"
-  | "device"
-  | "info"
-  | "basic"
-  | "management"
-  | "security"
-  | "message"
-  | "advanced";
+// 功能模块分类（非区块链）
+export type FunctionalCategory = "basic" | "device";
 
+// 区块链分类
 export type ChainCategory =
-  // | "device"
-  // | "basic"
   | "bitcoin"
   | "ethereum"
   | "solana"
@@ -94,6 +66,9 @@ export type ChainCategory =
   | "benfen"
   | "all-network";
 
+// 统一分类类型
+export type Category = FunctionalCategory | ChainCategory;
+
 // 执行相关类型
 export type ExecutionStatus =
   | "idle"
@@ -119,10 +94,10 @@ export interface LogEntry {
   duration?: number;
 }
 
-// 注册表统计类型
+// 注册表统计类型 - 简化
 export interface RegistryStats {
   totalChains: number;
   totalMethods: number;
-  methodsByCategory: Record<MethodCategory, number>;
+  functionalsByCategory: Record<FunctionalCategory, number>;
   chainsByCategory: Record<ChainCategory, number>;
 }
