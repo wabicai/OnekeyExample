@@ -12,7 +12,7 @@ import {
   DialogTitle,
 } from "../ui/Dialog";
 import { Alert, AlertDescription } from "../ui/Alert";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { AlertTriangle } from "lucide-react";
 import { Copy, Check } from "lucide-react";
 import type { DeviceModel, ThemeType } from "../ui/DeviceActionAnimation";
 import { useDeviceStore } from "../../store/deviceStore";
@@ -449,7 +449,7 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
                       variant="destructive"
                       className="border-destructive/50 bg-destructive/5"
                     >
-                      <ExclamationTriangleIcon className="h-4 w-4" />
+                      <AlertTriangle className="h-4 w-4" />
                       <AlertDescription className="text-destructive">
                         {error}
                       </AlertDescription>
@@ -475,7 +475,7 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
         <DialogContent className="bg-card border-border">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2 text-foreground">
-              <ExclamationTriangleIcon className="h-5 w-5 text-orange-500" />
+              <AlertTriangle className="h-5 w-5 text-orange-500" />
               <span>确认执行</span>
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">

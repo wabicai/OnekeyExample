@@ -18,14 +18,14 @@ export { default as cosmos } from "./cosmos";
 
 // 传统区块链
 export { default as tron } from "./tron";
-export { default as ripple } from "./ripple";
+export { default as ripple } from "./xrp";
 export { default as stellar } from "./stellar";
 export { default as neo } from "./neo";
 export { default as nem } from "./nem";
 
 // 新兴项目
 export { default as kaspa } from "./kaspa";
-export { default as algo } from "./algo";
+export { default as algorand } from "./algorand";
 export { default as filecoin } from "./filecoin";
 export { default as nervos } from "./nervos";
 export { default as starcoin } from "./starcoin";

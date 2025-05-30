@@ -9,12 +9,7 @@ import {
 } from "../../services/hardwareService";
 import { DeviceInfo } from "../../types/hardware";
 import { Button } from "../ui/Button";
-import {
-  ComputerDesktopIcon,
-  SignalIcon,
-  ArrowTopRightOnSquareIcon,
-  InformationCircleIcon,
-} from "@heroicons/react/24/outline";
+import { Monitor, Signal, ExternalLink, Info } from "lucide-react";
 import { Usb } from "lucide-react";
 
 interface TransportSwitcherProps {
@@ -54,14 +49,14 @@ const TransportSwitcher: React.FC<TransportSwitcherProps> = ({
     {
       type: "jsbridge",
       label: "JSBridge",
-      icon: <ComputerDesktopIcon className="h-4 w-4" />,
+      icon: <Monitor className="h-4 w-4" />,
       description: "稳定兼容",
       needsBridge: true,
     },
     {
       type: "webble",
       label: "WebBLE",
-      icon: <SignalIcon className="h-4 w-4" />,
+      icon: <Signal className="h-4 w-4" />,
       description: "蓝牙连接",
       disabled: true,
     },
@@ -221,7 +216,7 @@ const TransportSwitcher: React.FC<TransportSwitcherProps> = ({
             {/* JSBridge 下载提示 */}
             {option.type === "jsbridge" && option.needsBridge && (
               <div className="ml-8 flex items-center space-x-1.5 text-xs text-gray-500">
-                <InformationCircleIcon className="h-3 w-3" />
+                <Info className="h-3 w-3" />
                 <span>需要</span>
                 <a
                   href="https://help.onekey.so/hc/zh-cn/articles/9740566472335-%E4%B8%8B%E8%BD%BD%E5%B9%B6%E6%9B%B4%E6%96%B0-OneKey-Bridge"
@@ -230,7 +225,7 @@ const TransportSwitcher: React.FC<TransportSwitcherProps> = ({
                   className="text-blue-600 hover:text-blue-700 underline decoration-1 underline-offset-2 inline-flex items-center space-x-1 transition-colors"
                 >
                   <span>下载Bridge</span>
-                  <ArrowTopRightOnSquareIcon className="h-3 w-3" />
+                  <ExternalLink className="h-3 w-3" />
                 </a>
               </div>
             )}

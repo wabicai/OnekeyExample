@@ -1,93 +1,131 @@
 import React from "react";
-import { NetworkIcon } from "@web3icons/react"; // https://tokenicons.io/?type=network
-import { useTemplateRegistry } from "~/hooks/useTemplateRegistry";
+
+// 直接导入所有常用的图标资源
+import bitcoinIcon from "../../assets/chain/tbtc.png";
+import ethereumIcon from "../../assets/chain/teth.png";
+import solanaIcon from "../../assets/chain/sol.png";
+import tronIcon from "../../assets/chain/tron.png";
+import nearIcon from "../../assets/chain/near.png";
+import suiIcon from "../../assets/chain/sui.png";
+import tonIcon from "../../assets/chain/ton.png";
+import aptosIcon from "../../assets/chain/tapt.png";
+import filecoinIcon from "../../assets/chain/fil.png";
+import kaspaIcon from "../../assets/chain/kas.png";
+import nervosIcon from "../../assets/chain/nervos.png";
+import polkadotIcon from "../../assets/chain/polkadot.png";
+import cardanoIcon from "../../assets/chain/cardano.png";
+import algorandIcon from "../../assets/chain/algo.png";
+import cosmosIcon from "../../assets/chain/cosmos.png";
+import neoIcon from "../../assets/chain/neon3.png";
+import nemIcon from "../../assets/chain/nem.png";
+import starcoinIcon from "../../assets/chain/stc.png";
+import scdoIcon from "../../assets/chain/scdo.png";
+import dynexIcon from "../../assets/chain/dynex.png";
+import nexaIcon from "../../assets/chain/nexa.png";
+import nostrIcon from "../../assets/chain/nostr.png";
+import xrpIcon from "../../assets/chain/xrp.png";
+import confluxIcon from "../../assets/chain/conflux-espace.png";
+import lightningIcon from "../../assets/chain/lnd.png";
+import benfenIcon from "../../assets/chain/bfc.png";
+import stellarIcon from "../../assets/chain/stellar.png";
+import alephiumIcon from "../../assets/chain/alephium.png";
+import { ChainCategory } from "~/data/types";
 
 interface ChainIconProps {
-  chainId: string;
+  chainId: ChainCategory;
   size?: number | string;
-  variant?: "mono" | "branded";
   className?: string;
+  fallback?: React.ReactNode;
 }
 
-// 链ID到web3icons网络名称的映射
-const CHAIN_ID_TO_WEB3ICONS: Record<string, string> = {
-  bitcoin: "bitcoin",
-  ethereum: "ethereum",
-  solana: "solana",
-  cardano: "cardano",
-  polkadot: "polkadot",
-  sui: "sui",
-  near: "near-protocol",
-  ton: "ton",
-  aptos: "aptos",
-  cosmos: "cosmos",
-  tron: "tron",
-  xrp: "xrp",
-  ripple: "xrp",
-  stellar: "stellar",
-  kaspa: "kaspa",
-  algo: "algorand",
-  filecoin: "filecoin",
-  neo: "neon-evm",
-  conflux: "conflux",
-  benfen: "benfen",
+// 链ID到图标资源的直接映射 (预加载)
+const CHAIN_ICON_MAP: Record<ChainCategory, string> = {
+  // 主要区块链
+  xrp: xrpIcon,
+  stellar: stellarIcon,
+  bitcoin: bitcoinIcon,
+  ethereum: ethereumIcon,
+  solana: solanaIcon,
+  near: nearIcon,
+  sui: suiIcon,
+  cardano: cardanoIcon,
+  polkadot: polkadotIcon,
+  cosmos: cosmosIcon,
+  aptos: aptosIcon,
+  ton: tonIcon,
+  tron: tronIcon,
+  kaspa: kaspaIcon,
+  algorand: algorandIcon,
+  filecoin: filecoinIcon,
+  neo: neoIcon,
+  nem: nemIcon,
+  nervos: nervosIcon,
+  starcoin: starcoinIcon,
+  scdo: scdoIcon,
+  dynex: dynexIcon,
+  nexa: nexaIcon,
+  nostr: nostrIcon,
+  conflux: confluxIcon,
+  lightning: lightningIcon,
+  benfen: benfenIcon,
+  alephium: alephiumIcon,
+  "all-network": "",
 };
+
+// 默认的fallback图标
+const DefaultChainIcon: React.FC<{
+  size: number | string;
+  className: string;
+}> = ({ size, className }) => (
+  <div
+    className={`bg-gray-100 rounded-full flex items-center justify-center ${className}`}
+    style={{
+      width: typeof size === "number" ? `${size}px` : size,
+      height: typeof size === "number" ? `${size}px` : size,
+    }}
+  >
+    <span className="text-gray-400 text-xs font-bold">?</span>
+  </div>
+);
 
 export const ChainIcon: React.FC<ChainIconProps> = ({
   chainId,
   size = 24,
-  variant = "branded",
   className = "",
+  fallback,
 }) => {
-  const { getChain } = useTemplateRegistry();
-  const chainData = getChain(chainId);
-  const web3IconsName = CHAIN_ID_TO_WEB3ICONS[chainId];
-  console.log("icon", web3IconsName);
-  console.log("icon", chainId);
+  // 规范化chainId
+  const normalizedChainId = chainId.toLowerCase().replace(/[_\s]/g, "-");
 
-  const FallbackIcon = () => {
-    // 如果有默认图标名称，显示文字
-    if (chainData?.icon) {
-      return (
-        <div
-          className={`inline-flex items-center justify-center rounded ${className}`}
-          style={{
-            width: size,
-            height: size,
-            backgroundColor: chainData.color || "#6B7280",
-          }}
-        >
-          <span className="text-white text-xs font-bold">
-            {chainData.name.charAt(0).toUpperCase()}
-          </span>
-        </div>
-      );
+  // 直接从映射表获取图标
+  const iconSrc = CHAIN_ICON_MAP[normalizedChainId];
+
+  // 如果没找到图标，显示fallback
+  if (!iconSrc) {
+    if (fallback) {
+      return <>{fallback}</>;
     }
-
-    // 默认图标
-    return (
-      <div
-        className={`inline-flex items-center justify-center rounded bg-gray-500 ${className}`}
-        style={{ width: size, height: size }}
-      >
-        <span className="text-white text-xs font-bold">?</span>
-      </div>
-    );
-  };
-
-  // 优先尝试使用 web3icons
-  if (web3IconsName) {
-    return (
-      <NetworkIcon
-        name={web3IconsName}
-        size={size}
-        variant={variant}
-        className={className}
-        fallback={<FallbackIcon />}
-      />
-    );
+    return <DefaultChainIcon size={size} className={className} />;
   }
 
-  // 如果没有对应的 web3icons 映射，直接使用回退图标
-  return <FallbackIcon />;
+  // 显示图标
+  return (
+    <img
+      src={iconSrc}
+      alt={`${chainId} chain icon`}
+      className={`object-contain ${className}`}
+      style={{
+        width: typeof size === "number" ? `${size}px` : size,
+        height: typeof size === "number" ? `${size}px` : size,
+      }}
+      onError={(e) => {
+        // 图片加载失败时隐藏img标签
+        const target = e.target as HTMLImageElement;
+        target.style.display = "none";
+        console.warn(
+          `ChainIcon: Failed to display icon for chainId "${chainId}"`
+        );
+      }}
+    />
+  );
 };

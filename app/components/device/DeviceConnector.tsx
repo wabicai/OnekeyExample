@@ -5,20 +5,14 @@ import { DeviceInfo } from "../../types/hardware";
 import { searchDevices } from "../../services/hardwareService";
 import { useSDK } from "../../hooks/useSDK";
 import DeviceIcon from "./DeviceIcon";
-import { isClassicDevice } from "../../utils/deviceTypeUtils";
+import { isClassicModelDevice } from "../../utils/deviceTypeUtils";
 import { Button } from "../ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
 import { Badge } from "../ui/Badge";
 import { Alert, AlertDescription } from "../ui/Alert";
 import { Progress } from "../ui/Progress";
 import { Separator } from "../ui/Separator";
-import {
-  ExclamationCircleIcon,
-  CheckCircleIcon,
-  WifiIcon,
-  ComputerDesktopIcon,
-  SignalIcon,
-} from "@heroicons/react/24/outline";
+import { AlertCircle, CheckCircle, Wifi, Monitor, Signal } from "lucide-react";
 import { getDeviceType, getDeviceLabel } from "@onekeyfe/hd-core";
 
 const DeviceConnector: React.FC = () => {
@@ -45,7 +39,7 @@ const DeviceConnector: React.FC = () => {
     {
       type: "JSBridge",
       label: t("device.jsbridge"),
-      icon: <WifiIcon className="h-5 w-5" />,
+      icon: <Wifi className="h-5 w-5" />,
       description: "通过 Bridge 软件连接（推荐）",
       available: true,
       recommended: true,
@@ -53,7 +47,7 @@ const DeviceConnector: React.FC = () => {
     {
       type: "WebUSB",
       label: t("device.webusb"),
-      icon: <ComputerDesktopIcon className="h-5 w-5" />,
+      icon: <Monitor className="h-5 w-5" />,
       description: "通过 USB 直接连接",
       available: true,
       recommended: false,
@@ -61,7 +55,7 @@ const DeviceConnector: React.FC = () => {
     {
       type: "WebBLE",
       label: t("device.bluetooth"),
-      icon: <SignalIcon className="h-5 w-5" />,
+      icon: <Signal className="h-5 w-5" />,
       description: "通过蓝牙连接（即将推出）",
       available: false,
       recommended: false,
@@ -305,7 +299,7 @@ const DeviceConnector: React.FC = () => {
           {/* Error Display */}
           {error && (
             <Alert variant="destructive">
-              <ExclamationCircleIcon className="h-4 w-4" />
+              <AlertCircle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
@@ -313,7 +307,7 @@ const DeviceConnector: React.FC = () => {
           {/* Current Device */}
           {currentDevice && (
             <Alert className="border-green-200 bg-green-50">
-              <CheckCircleIcon className="h-4 w-4 text-green-600" />
+              <CheckCircle className="h-4 w-4 text-green-600" />
               <AlertDescription>
                 <div className="space-y-4">
                   <div className="flex justify-between items-start">
@@ -434,7 +428,7 @@ const DeviceConnector: React.FC = () => {
                             passPhrase保护
                           </Badge>
                         )}
-                        {isClassicDevice(currentDevice.deviceType) && (
+                        {isClassicModelDevice(currentDevice.deviceType) && (
                           <Badge
                             variant="outline"
                             className="bg-orange-100 text-orange-700 border-orange-300 text-xs"

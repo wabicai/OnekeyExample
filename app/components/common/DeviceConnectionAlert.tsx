@@ -1,4 +1,4 @@
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { Info } from "lucide-react";
 import { Card, CardContent } from "~/components/ui/Card";
 import { useDeviceStore } from "~/store/deviceStore";
 
@@ -21,7 +21,7 @@ export function DeviceConnectionAlert({
     <Card className={`border-yellow-200 bg-yellow-50 ${className}`}>
       <CardContent className="py-4">
         <div className="flex items-center space-x-2 text-yellow-800">
-          <InformationCircleIcon className="h-5 w-5" />
+          <Info className="h-5 w-5" />
           <span>{message}</span>
         </div>
       </CardContent>

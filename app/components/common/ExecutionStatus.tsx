@@ -1,10 +1,6 @@
 import { Alert, AlertDescription } from "../ui/Alert";
 import DeviceActionAnimation from "../ui/DeviceActionAnimation";
-import {
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  ClockIcon,
-} from "@heroicons/react/24/outline";
+import { CheckCircle, AlertTriangle, Clock } from "lucide-react";
 import type { DeviceModel, ThemeType } from "../ui/DeviceActionAnimation";
 
 export type ExecutionStatus =
@@ -36,7 +32,7 @@ export function ExecutionStatus({
       case "loading":
         return {
           variant: "default" as const,
-          icon: ClockIcon,
+          icon: Clock,
           title: "正在执行...",
           description: "请等待方法执行完成",
           color: "text-blue-600",
@@ -46,7 +42,7 @@ export function ExecutionStatus({
       case "device-interaction":
         return {
           variant: "default" as const,
-          icon: ClockIcon,
+          icon: Clock,
           title: "设备交互",
           description: "请在设备上确认操作",
           color: "text-orange-600",
@@ -56,7 +52,7 @@ export function ExecutionStatus({
       case "success":
         return {
           variant: "default" as const,
-          icon: CheckCircleIcon,
+          icon: CheckCircle,
           title: "执行成功",
           description: "方法已成功执行",
           color: "text-green-600",
@@ -66,7 +62,7 @@ export function ExecutionStatus({
       case "error":
         return {
           variant: "warning" as const,
-          icon: ExclamationTriangleIcon,
+          icon: AlertTriangle,
           title: "执行失败",
           description: error || "执行过程中发生错误",
           color: "text-red-600",

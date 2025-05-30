@@ -3,13 +3,7 @@ import { Card, CardContent } from "./Card";
 import { DeviceIcon } from "../icons/DeviceIcon";
 import { useDeviceStore } from "../../store/deviceStore";
 import { Button } from "./Button";
-import {
-  XMarkIcon,
-  WifiIcon,
-  ComputerDesktopIcon,
-  SignalIcon,
-  CheckCircleIcon,
-} from "@heroicons/react/24/outline";
+import { X, Wifi, Monitor, Signal, CheckCircle } from "lucide-react";
 import { Badge } from "./Badge";
 
 export const DeviceStatus: React.FC = () => {
@@ -26,7 +20,7 @@ export const DeviceStatus: React.FC = () => {
         <CardContent className="p-4">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
-              <WifiIcon className="h-5 w-5 text-gray-400" />
+              <Wifi className="h-5 w-5 text-gray-400" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-700">未连接设备</p>
@@ -49,7 +43,7 @@ export const DeviceStatus: React.FC = () => {
       return {
         label: "WebUSB",
         variant: "secondary" as const,
-        icon: <ComputerDesktopIcon className="h-4 w-4" />,
+        icon: <Monitor className="h-4 w-4" />,
         className: "bg-blue-50 text-blue-700 border-blue-200",
       };
     } else if (
@@ -59,7 +53,7 @@ export const DeviceStatus: React.FC = () => {
       return {
         label: "JSBridge",
         variant: "secondary" as const,
-        icon: <WifiIcon className="h-4 w-4" />,
+        icon: <Wifi className="h-4 w-4" />,
         className: "bg-purple-50 text-purple-700 border-purple-200",
       };
     } else if (
@@ -69,14 +63,14 @@ export const DeviceStatus: React.FC = () => {
       return {
         label: "WebBLE",
         variant: "secondary" as const,
-        icon: <SignalIcon className="h-4 w-4" />,
+        icon: <Signal className="h-4 w-4" />,
         className: "bg-indigo-50 text-indigo-700 border-indigo-200",
       };
     } else {
       return {
         label: "未知",
         variant: "secondary" as const,
-        icon: <WifiIcon className="h-4 w-4" />,
+        icon: <Wifi className="h-4 w-4" />,
         className: "bg-gray-50 text-gray-700 border-gray-200",
       };
     }
@@ -111,7 +105,7 @@ export const DeviceStatus: React.FC = () => {
                 <DeviceIcon className="w-5 h-5 text-white" />
               </div>
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white">
-                <CheckCircleIcon className="w-2 h-2 text-white" />
+                <CheckCircle className="w-2 h-2 text-white" />
               </div>
             </div>
             <div className="flex-1 min-w-0">
@@ -128,7 +122,7 @@ export const DeviceStatus: React.FC = () => {
             className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-500 transition-all duration-200 text-gray-400 rounded-lg"
             title="断开连接"
           >
-            <XMarkIcon className="h-4 w-4" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
 

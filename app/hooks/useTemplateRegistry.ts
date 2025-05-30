@@ -1,5 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
-import type { ChainConfig, MethodConfig, MethodCategory, ChainCategory, ParameterField, MethodPreset } from "~/data/types";
+import type {
+  ChainConfig,
+  MethodConfig,
+  MethodCategory,
+  ChainCategory,
+  ParameterField,
+  MethodPreset,
+} from "~/data/types";
 import type { HardwareApiMethod } from "~/services/hardwareService";
 
 // 简化的注册表状态
@@ -10,7 +17,6 @@ interface RegistryStats {
   chainsByCategory: Record<ChainCategory, number>;
 }
 
-// 旧数据格式类型
 interface PlaygroundProps {
   method: string;
   description: string;
@@ -30,11 +36,13 @@ interface ChainMeta {
 }
 
 // 数据转换适配器
-function convertPlaygroundPropsToMethodConfig(props: PlaygroundProps): MethodConfig {
+function convertPlaygroundPropsToMethodConfig(
+  props: PlaygroundProps
+): MethodConfig {
   // 推断方法分类
   let category: MethodCategory = "basic";
   const method = props.method.toLowerCase();
-  
+
   if (method.includes("address")) category = "address";
   else if (method.includes("publickey")) category = "publicKey";
   else if (method.includes("sign")) category = "signing";
@@ -49,15 +57,15 @@ function convertPlaygroundPropsToMethodConfig(props: PlaygroundProps): MethodCon
   // 从预设中提取参数和预设配置
   if (props.presupposes) {
     const allKeys = new Set<string>();
-    props.presupposes.forEach(preset => {
-      Object.keys(preset.value).forEach(key => allKeys.add(key));
+    props.presupposes.forEach((preset) => {
+      Object.keys(preset.value).forEach((key) => allKeys.add(key));
     });
 
     // 生成方法参数
-    allKeys.forEach(key => {
+    allKeys.forEach((key) => {
       const sampleValue = props.presupposes![0].value[key];
       let type: ParameterField["type"] = "string";
-      
+
       if (typeof sampleValue === "boolean") type = "boolean";
       else if (typeof sampleValue === "number") type = "number";
       else if (Array.isArray(sampleValue)) type = "textarea";
@@ -75,7 +83,7 @@ function convertPlaygroundPropsToMethodConfig(props: PlaygroundProps): MethodCon
     });
 
     // 生成预设配置
-    props.presupposes.forEach(preset => {
+    props.presupposes.forEach((preset) => {
       presets.push({
         title: preset.title,
         values: preset.value,
@@ -85,7 +93,7 @@ function convertPlaygroundPropsToMethodConfig(props: PlaygroundProps): MethodCon
 
   return {
     method: props.method as HardwareApiMethod,
-    name: props.method.replace(/([A-Z])/g, ' $1').trim(),
+    name: props.method.replace(/([A-Z])/g, " $1").trim(),
     description: props.description,
     category,
     parameters,
@@ -108,24 +116,21 @@ class TemplateRegistry {
         { module: import("~/data/methods/solana"), id: "solana" },
         { module: import("~/data/methods/cardano"), id: "cardano" },
         { module: import("~/data/methods/polkadot"), id: "polkadot" },
-        
-        // Layer 2 & 新兴链
+
         { module: import("~/data/methods/sui"), id: "sui" },
         { module: import("~/data/methods/aptos"), id: "aptos" },
         { module: import("~/data/methods/near"), id: "near" },
         { module: import("~/data/methods/ton"), id: "ton" },
         { module: import("~/data/methods/cosmos"), id: "cosmos" },
-        
-        // 传统区块链
+
         { module: import("~/data/methods/tron"), id: "tron" },
-        { module: import("~/data/methods/ripple"), id: "ripple" },
+        { module: import("~/data/methods/xrp"), id: "ripple" },
         { module: import("~/data/methods/stellar"), id: "stellar" },
         { module: import("~/data/methods/neo"), id: "neo" },
         { module: import("~/data/methods/nem"), id: "nem" },
-        
-        // 新兴项目
+
         { module: import("~/data/methods/kaspa"), id: "kaspa" },
-        { module: import("~/data/methods/algo"), id: "algo" },
+        { module: import("~/data/methods/algorand"), id: "algorand" },
         { module: import("~/data/methods/filecoin"), id: "filecoin" },
         { module: import("~/data/methods/nervos"), id: "nervos" },
         { module: import("~/data/methods/starcoin"), id: "starcoin" },
@@ -135,15 +140,12 @@ class TemplateRegistry {
         { module: import("~/data/methods/alephium"), id: "alephium" },
         { module: import("~/data/methods/conflux"), id: "conflux" },
         { module: import("~/data/methods/nostr"), id: "nostr" },
-        
-        // 特殊网络
+
         { module: import("~/data/methods/lightning"), id: "lightning" },
         { module: import("~/data/methods/allnetwork"), id: "allnetwork" },
-        
-        // 测试链
+
         { module: import("~/data/methods/benfen"), id: "benfen" },
-        
-        // 设备和基础操作
+
         { module: import("~/data/methods/device"), id: "device" },
         { module: import("~/data/methods/basic"), id: "basic" },
       ];
@@ -154,11 +156,11 @@ class TemplateRegistry {
             const moduleData = await module;
             const api = moduleData.default as PlaygroundProps[];
             const chainMeta = moduleData.chainMeta as ChainMeta;
-            
+
             if (!api || !chainMeta) return null;
 
             const methods = api.map(convertPlaygroundPropsToMethodConfig);
-            
+
             return {
               id: chainMeta.id,
               name: chainMeta.name,
@@ -193,11 +195,11 @@ class TemplateRegistry {
   }
 
   getAllMethods(): MethodConfig[] {
-    return this.chains.flatMap(chain => chain.methods);
+    return this.chains.flatMap((chain) => chain.methods);
   }
 
   getChain(chainId: string): ChainConfig | undefined {
-    return this.chains.find(chain => chain.id === chainId);
+    return this.chains.find((chain) => chain.id === chainId);
   }
 
   getChainMethods(chainId: string): MethodConfig[] {
@@ -206,36 +208,41 @@ class TemplateRegistry {
   }
 
   getMethodsByCategory(category: MethodCategory): MethodConfig[] {
-    return this.getAllMethods().filter(method => method.category === category);
+    return this.getAllMethods().filter(
+      (method) => method.category === category
+    );
   }
 
   getChainsByCategory(category: ChainCategory): ChainConfig[] {
-    return this.chains.filter(chain => chain.category === category);
+    return this.chains.filter((chain) => chain.category === category);
   }
 
   searchMethods(query: string): MethodConfig[] {
     const searchTerm = query.toLowerCase();
-    return this.getAllMethods().filter(method =>
-      method.name.toLowerCase().includes(searchTerm) ||
-      method.description.toLowerCase().includes(searchTerm) ||
-      method.method.toLowerCase().includes(searchTerm)
+    return this.getAllMethods().filter(
+      (method) =>
+        method.name.toLowerCase().includes(searchTerm) ||
+        method.description.toLowerCase().includes(searchTerm) ||
+        method.method.toLowerCase().includes(searchTerm)
     );
   }
 
   getStats(): RegistryStats {
     const allMethods = this.getAllMethods();
-    
+
     const methodsByCategory = {} as Record<MethodCategory, number>;
     const chainsByCategory = {} as Record<ChainCategory, number>;
-    
+
     // 统计方法分类
-    allMethods.forEach(method => {
-      methodsByCategory[method.category] = (methodsByCategory[method.category] || 0) + 1;
+    allMethods.forEach((method) => {
+      methodsByCategory[method.category] =
+        (methodsByCategory[method.category] || 0) + 1;
     });
-    
+
     // 统计链分类
-    this.chains.forEach(chain => {
-      chainsByCategory[chain.category] = (chainsByCategory[chain.category] || 0) + 1;
+    this.chains.forEach((chain) => {
+      chainsByCategory[chain.category] =
+        (chainsByCategory[chain.category] || 0) + 1;
     });
 
     return {
@@ -260,7 +267,7 @@ export function useTemplateRegistry() {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       await templateRegistry.initialize();
       setIsReady(true);
     } catch (err) {
@@ -284,21 +291,38 @@ export function useTemplateRegistry() {
     // 数据
     chains: isReady ? templateRegistry.getAllChains() : [],
     allMethods: isReady ? templateRegistry.getAllMethods() : [],
-    
+
     // 查询方法
-    getChain: useCallback((chainId: string) => templateRegistry.getChain(chainId), [isReady]),
-    getChainMethods: useCallback((chainId: string) => templateRegistry.getChainMethods(chainId), [isReady]),
-    getMethodsByCategory: useCallback((category: MethodCategory) => templateRegistry.getMethodsByCategory(category), [isReady]),
-    getChainsByCategory: useCallback((category: ChainCategory) => templateRegistry.getChainsByCategory(category), [isReady]),
-    searchMethods: useCallback((query: string) => templateRegistry.searchMethods(query), [isReady]),
+    getChain: useCallback(
+      (chainId: string) => templateRegistry.getChain(chainId),
+      [isReady]
+    ),
+    getChainMethods: useCallback(
+      (chainId: string) => templateRegistry.getChainMethods(chainId),
+      [isReady]
+    ),
+    getMethodsByCategory: useCallback(
+      (category: MethodCategory) =>
+        templateRegistry.getMethodsByCategory(category),
+      [isReady]
+    ),
+    getChainsByCategory: useCallback(
+      (category: ChainCategory) =>
+        templateRegistry.getChainsByCategory(category),
+      [isReady]
+    ),
+    searchMethods: useCallback(
+      (query: string) => templateRegistry.searchMethods(query),
+      [isReady]
+    ),
     getStats: useCallback(() => templateRegistry.getStats(), [isReady]),
-    
+
     // 状态
     isLoading,
     error,
     isReady: isReady && templateRegistry.isReady(),
-    
+
     // 工具
     refreshTemplates,
   };
-} 
+}

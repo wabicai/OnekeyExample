@@ -3,14 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
 import { Button } from "../ui/Button";
 import DeviceActionAnimation from "../ui/DeviceActionAnimation";
 import {
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  ClockIcon,
-  ArrowRightIcon,
-  DeviceTabletIcon,
-  PlayIcon,
-  ArrowPathIcon,
-} from "@heroicons/react/24/outline";
+  CheckCircle,
+  AlertTriangle,
+  Clock,
+  ArrowRight,
+  Tablet,
+  Play,
+  RotateCcw,
+} from "lucide-react";
 import type { DeviceModel, ThemeType } from "../ui/DeviceActionAnimation";
 import * as hardwareService from "../../services/hardwareService";
 
@@ -46,7 +46,7 @@ const DeviceInteractionArea: React.FC<DeviceInteractionAreaProps> = ({
     switch (status) {
       case "loading":
         return {
-          icon: <ClockIcon className="h-5 w-5 animate-spin" />,
+          icon: <Clock className="h-5 w-5 animate-spin" />,
           color: "text-blue-600",
           bgColor: "bg-blue-50",
           borderColor: "border-blue-200",
@@ -55,7 +55,7 @@ const DeviceInteractionArea: React.FC<DeviceInteractionAreaProps> = ({
         };
       case "device-interaction":
         return {
-          icon: <ClockIcon className="h-5 w-5 animate-pulse" />,
+          icon: <Clock className="h-5 w-5 animate-pulse" />,
           color: "text-orange-600",
           bgColor: "bg-orange-50",
           borderColor: "border-orange-200",
@@ -64,7 +64,7 @@ const DeviceInteractionArea: React.FC<DeviceInteractionAreaProps> = ({
         };
       case "success":
         return {
-          icon: <CheckCircleIcon className="h-5 w-5" />,
+          icon: <CheckCircle className="h-5 w-5" />,
           color: "text-green-600",
           bgColor: "bg-green-50",
           borderColor: "border-green-200",
@@ -73,7 +73,7 @@ const DeviceInteractionArea: React.FC<DeviceInteractionAreaProps> = ({
         };
       case "error":
         return {
-          icon: <ExclamationTriangleIcon className="h-5 w-5" />,
+          icon: <AlertTriangle className="h-5 w-5" />,
           color: "text-red-600",
           bgColor: "bg-red-50",
           borderColor: "border-red-200",
@@ -82,7 +82,7 @@ const DeviceInteractionArea: React.FC<DeviceInteractionAreaProps> = ({
         };
       default:
         return {
-          icon: <ArrowRightIcon className="h-5 w-5" />,
+          icon: <ArrowRight className="h-5 w-5" />,
           color: "text-muted-foreground",
           bgColor: "bg-muted/20",
           borderColor: "border-border/50",
@@ -125,7 +125,7 @@ const DeviceInteractionArea: React.FC<DeviceInteractionAreaProps> = ({
               <div className="w-full h-full bg-muted/20 rounded-xl border-2 border-dashed border-border/50 flex flex-col items-center justify-center">
                 <div className="w-28 h-28 bg-muted/30 rounded-full flex items-center justify-center mb-8 border border-border">
                   {status === "idle" ? (
-                    <DeviceTabletIcon className="h-14 w-14 text-muted-foreground" />
+                    <Tablet className="h-14 w-14 text-muted-foreground" />
                   ) : (
                     <div className={statusConfig.color}>
                       {statusConfig.icon}
@@ -152,12 +152,12 @@ const DeviceInteractionArea: React.FC<DeviceInteractionAreaProps> = ({
             >
               {status === "loading" || status === "device-interaction" ? (
                 <>
-                  <ClockIcon className="h-4 w-4 animate-spin" />
+                  <Clock className="h-4 w-4 animate-spin" />
                   <span>执行中</span>
                 </>
               ) : (
                 <>
-                  <PlayIcon className="h-4 w-4" />
+                  <Play className="h-4 w-4" />
                   <span>执行</span>
                 </>
               )}
@@ -178,7 +178,7 @@ const DeviceInteractionArea: React.FC<DeviceInteractionAreaProps> = ({
                   : "border-border text-foreground hover:bg-muted h-11 text-sm flex items-center gap-2"
               }
             >
-              <ArrowPathIcon className="h-4 w-4" />
+              <RotateCcw className="h-4 w-4" />
               <span>取消</span>
             </Button>
           </div>

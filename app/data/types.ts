@@ -50,7 +50,7 @@ export interface ChainConfig {
 // 分类类型
 export type MethodCategory =
   | "address"
-  | "publicKey" 
+  | "publicKey"
   | "signing"
   | "transaction"
   | "device"
@@ -62,44 +62,44 @@ export type MethodCategory =
   | "advanced";
 
 export type ChainCategory =
+  // | "device"
+  // | "basic"
   | "bitcoin"
   | "ethereum"
   | "solana"
   | "cardano"
   | "polkadot"
-  | "device"
-  | "basic"
-  | "cosmos"
-  | "near"
-  | "aptos"
   | "sui"
+  | "aptos"
+  | "near"
   | "ton"
+  | "cosmos"
   | "tron"
-  | "ripple"
+  | "xrp"
   | "stellar"
+  | "neo"
+  | "nem"
   | "kaspa"
   | "algorand"
   | "filecoin"
-  | "neo"
-  | "nem"
   | "nervos"
   | "starcoin"
   | "scdo"
   | "dynex"
   | "nexa"
-  | "nostr"
   | "alephium"
+  | "conflux"
+  | "nostr"
+  | "lightning"
   | "benfen"
-  | "experimental"
-  | "testnet"
-  | "other";
+  | "all-network";
 
 // 执行相关类型
-export type ExecutionStatus = 
-  | "idle" 
-  | "loading" 
-  | "device-interaction" 
-  | "success" 
+export type ExecutionStatus =
+  | "idle"
+  | "loading"
+  | "device-interaction"
+  | "success"
   | "error";
 
 export interface ExecutionResult {
