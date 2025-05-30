@@ -12,8 +12,7 @@ import {
   DialogTitle,
 } from "../ui/Dialog";
 import { Alert, AlertDescription } from "../ui/Alert";
-import { AlertTriangle } from "lucide-react";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, AlertTriangle } from "lucide-react";
 import type { DeviceModel, ThemeType } from "../ui/DeviceActionAnimation";
 import { useDeviceStore } from "../../store/deviceStore";
 import { useToast } from "../../hooks/use-toast";
@@ -68,8 +67,32 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
   } | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // 获取方法的所有参数，确保不为undefined
-  const allParameters = methodConfig.parameters || [];
+  // 获取方法的所有参数，从预设中推断（因为新的 MethodConfig 没有 parameters 字段）
+  const getAllParametersFromPresets = (): Array<{
+    name: string;
+    type: string;
+    required: boolean;
+    default?: unknown;
+  }> => {
+    if (!methodConfig.presets || methodConfig.presets.length === 0) {
+      return [];
+    }
+
+    const parameterSet = new Set<string>();
+    methodConfig.presets.forEach((preset) => {
+      Object.keys(preset.value).forEach((key) => {
+        parameterSet.add(key);
+      });
+    });
+
+    return Array.from(parameterSet).map((name) => ({
+      name,
+      type: "string", // 默认类型
+      required: false, // 默认非必需
+    }));
+  };
+
+  const allParameters = getAllParametersFromPresets();
 
   // 获取默认参数值
   const getDefaultParams = (): Record<string, unknown> => {
@@ -85,7 +108,7 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
   // 初始化参数值
   useEffect(() => {
     // 🔥 方法变化时，完全重置所有方法参数
-    console.log("[MethodExecutor] 🔄 方法变化，重置参数:", methodConfig.name);
+    console.log("[MethodExecutor] 🔄 方法变化，重置参数:", methodConfig.method);
     resetMethodParameters();
 
     const defaultParams = getDefaultParams();
@@ -96,12 +119,12 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
       setSelectedPreset(firstPreset.title);
 
       // 🔥 完全替换参数：只使用预设值，加上必要的默认值
-      const presetParams = { ...defaultParams, ...firstPreset.values };
+      const presetParams = { ...defaultParams, ...firstPreset.value };
 
       console.log("[MethodExecutor] 📋 初始化参数:", {
-        方法名称: methodConfig.name,
+        方法名称: methodConfig.method,
         默认参数: defaultParams,
-        预设参数: firstPreset.values,
+        预设参数: firstPreset.value,
         最终参数: presetParams,
       });
 
@@ -111,7 +134,7 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
       setMethodParameters(defaultParams);
 
       console.log("[MethodExecutor] 📋 无预设，使用默认参数:", {
-        方法名称: methodConfig.name,
+        方法名称: methodConfig.method,
         默认参数: defaultParams,
       });
     }
@@ -146,12 +169,12 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
 
       // 🔥 完全替换参数：先获取默认值，再应用预设值
       const defaultParams = getDefaultParams();
-      const newParams = { ...defaultParams, ...preset.values };
+      const newParams = { ...defaultParams, ...preset.value };
 
       console.log("[MethodExecutor] 🔄 切换预设:", {
         预设名称: presetTitle,
         默认参数: defaultParams,
-        预设参数: preset.values,
+        预设参数: preset.value,
         最终参数: newParams,
       });
 
@@ -198,8 +221,10 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
       return;
     }
 
-    // 危险操作需要确认
-    if (methodConfig.dangerous || methodConfig.requiresConfirmation) {
+    // 检查是否需要确认（仅对已弃用的方法显示警告）
+    const needsConfirmation = methodConfig.deprecated;
+
+    if (needsConfirmation) {
       setShowConfirmDialog(true);
       return;
     }
@@ -231,7 +256,7 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
 
       toast({
         title: "执行成功",
-        description: `${methodConfig.name} 执行完成 (${duration}ms)`,
+        description: `${methodConfig.method} 执行完成 (${duration}ms)`,
       });
 
       onResult?.(execResult);
@@ -479,8 +504,8 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
               <span>确认执行</span>
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              {methodConfig.dangerous
-                ? "这是一个危险操作，可能会影响设备安全。请确认您了解此操作的风险。"
+              {methodConfig.deprecated
+                ? "这是一个已弃用的方法，可能会影响设备安全。请确认您了解此操作的风险。"
                 : "请确认您要执行此操作。"}
             </DialogDescription>
           </DialogHeader>
@@ -488,7 +513,7 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
             <p className="text-sm text-muted-foreground">
               操作：
               <span className="font-medium text-foreground">
-                {methodConfig.name}
+                {methodConfig.method}
               </span>
             </p>
             <p className="text-sm text-muted-foreground mt-1">
@@ -505,9 +530,9 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
             </Button>
             <Button
               onClick={performExecution}
-              variant={methodConfig.dangerous ? "destructive" : "default"}
+              variant={methodConfig.deprecated ? "destructive" : "default"}
               className={
-                methodConfig.dangerous
+                methodConfig.deprecated
                   ? ""
                   : "bg-primary hover:bg-primary/90 text-primary-foreground"
               }

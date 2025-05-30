@@ -82,14 +82,6 @@ export default function IndexPage() {
                           </div>
                         </div>
                       </div>
-                      <Badge
-                        variant={currentDevice ? "default" : "secondary"}
-                        className="text-xs px-2 py-1"
-                      >
-                        {currentDevice
-                          ? t("common.ready")
-                          : t("common.waiting")}
-                      </Badge>
                     </div>
                   </div>
 

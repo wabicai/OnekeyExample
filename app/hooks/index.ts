@@ -1,4 +1,8 @@
-export { useSDK } from './useSDK';
-export { useToast } from './use-toast';
-export { useTemplateRegistry } from './useTemplateRegistry';
-export { useMethodExecution } from './useMethodExecution'; 
+// 核心模板注册表
+export { useTemplateRegistry } from "./useTemplateRegistry";
+
+// 统一方法解析器
+export { useMethodResolver } from "./useMethodResolver";
+
+// 方法执行
+export { useMethodExecution } from "./useMethodExecution";

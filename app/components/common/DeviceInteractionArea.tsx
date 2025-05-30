@@ -98,13 +98,7 @@ const DeviceInteractionArea: React.FC<DeviceInteractionAreaProps> = ({
     <Card className="bg-card border border-border/50 shadow-sm min-h-[600px] flex flex-col">
       <CardHeader className="pb-1">
         <CardTitle className="text-sm text-foreground flex items-center justify-between">
-          设备交互
-          {/* <Badge
-            variant="outline"
-            className={`text-xs ${statusConfig.badgeColor}`}
-          >
-            {statusConfig.message}
-          </Badge> */}
+          期望的用户体验：
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col">
@@ -112,7 +106,7 @@ const DeviceInteractionArea: React.FC<DeviceInteractionAreaProps> = ({
           {/* 设备展示区域 - 占用更多空间 */}
           <div className="flex-1 w-full flex items-center justify-center min-h-96 mb-6">
             {deviceAction ? (
-              <div className="w-80 h-80">
+              <div className="w-100 h-100">
                 <DeviceActionAnimation
                   action={deviceAction.actionType}
                   deviceModel={deviceModel}

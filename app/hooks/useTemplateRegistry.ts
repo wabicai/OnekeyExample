@@ -183,11 +183,12 @@ class TemplateRegistry {
 // 全局注册表实例
 const templateRegistry = new TemplateRegistry();
 
-// Hook - 简化接口
+// Hook
 export function useTemplateRegistry() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const initializeRegistry = useCallback(async () => {
     try {
@@ -196,6 +197,7 @@ export function useTemplateRegistry() {
 
       await templateRegistry.initialize();
       setIsReady(true);
+      setIsInitialLoad(false);
     } catch (err) {
       console.error("Failed to initialize template registry:", err);
       setError(err instanceof Error ? err.message : "初始化失败");
@@ -249,6 +251,11 @@ export function useTemplateRegistry() {
     isLoading,
     error,
     isReady: isReady && templateRegistry.isReady(),
+
+    // 新增：区分初始加载和后续操作
+    isInitialLoading: isInitialLoad && (isLoading || !isReady),
+    // 新增：是否完全就绪（数据已加载且注册表已初始化）
+    isFullyReady: isReady && !isLoading && templateRegistry.isReady(),
 
     // 工具
     refreshTemplates,
