@@ -1,9 +1,8 @@
 import { Card, CardContent } from "../ui/Card";
 import { Button } from "../ui/Button";
-import { Badge } from "../ui/Badge";
 import { useNavigate } from "@remix-run/react";
 import { useTranslation } from "react-i18next";
-import { Home, UsbIcon, Wifi, AlertTriangle, ArrowRight } from "lucide-react";
+import { Home, AlertTriangle, ArrowRight } from "lucide-react";
 import { useDeviceStore } from "../../store/deviceStore";
 
 interface DeviceNotConnectedStateProps {

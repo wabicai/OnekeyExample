@@ -1,5 +1,4 @@
-import i18n from "i18next";
-import { InitOptions } from "i18next";
+import i18n, { InitOptions, use } from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 
@@ -42,9 +41,11 @@ const enResources = {
       execute: "Execute",
       confirm: "Confirm",
       deviceManagement: "Device Management",
-      deviceManagementDesc: "Device status inquiry, configuration and management operations",
-      basicOperations: "Basic Operations", 
-      basicOperationsDesc: "Basic device connection and communication operations",
+      deviceManagementDesc:
+        "Device status inquiry, configuration and management operations",
+      basicOperations: "Basic Operations",
+      basicOperationsDesc:
+        "Basic device connection and communication operations",
       cancel: "Cancel",
       error: "Error",
       goToHomePage: "Go to the home page",
@@ -53,29 +54,37 @@ const enResources = {
     home: {
       subtitle: "Explore and test OneKey hardware wallet SDK functionalities",
       deviceMethods: "Device Methods",
-      deviceMethodsDesc: "Access device information, manage settings, and perform device-specific operations",
+      deviceMethodsDesc:
+        "Access device information, manage settings, and perform device-specific operations",
       chainMethods: "Chain Methods",
-      chainMethodsDesc: "Interact with different blockchain networks through your OneKey device",
+      chainMethodsDesc:
+        "Interact with different blockchain networks through your OneKey device",
       logs: "System Logs",
-      logsDesc: "View detailed logs of all device operations and API interactions",
+      logsDesc:
+        "View detailed logs of all device operations and API interactions",
       quickStart: "Quick Start Guide",
-      quickStartDesc: "Follow these simple steps to get started with OneKey SDK",
+      quickStartDesc:
+        "Follow these simple steps to get started with OneKey SDK",
       step1: "Connect your OneKey device via USB or Bluetooth",
       step2: "Choose a transport method (WebUSB or JSBridge)",
       step3: "Explore device methods to manage your hardware wallet",
       step4: "Test chain methods to interact with blockchains",
       security: "Enterprise Security",
-      securityDesc: "Military-grade security with hardware-based key storage and isolation",
+      securityDesc:
+        "Military-grade security with hardware-based key storage and isolation",
       openSource: "Open Source",
-      openSourceDesc: "Fully open-source codebase for transparency and community contributions",
+      openSourceDesc:
+        "Fully open-source codebase for transparency and community contributions",
       getStarted: "Ready to Get Started?",
-      getStartedDesc: "Explore OneKey SDK features with your hardware wallet device",
+      getStartedDesc:
+        "Explore OneKey SDK features with your hardware wallet device",
       tryDemo: "Try Demo Now",
       initializing: "Initializing",
       waiting: "Waiting",
       unknown: "Unknown Device",
       connectionRequired: "Device Connection Required",
-      pleaseConnectFirst: "Please connect your hardware device before performing operations",
+      pleaseConnectFirst:
+        "Please connect your hardware device before performing operations",
       noActiveConnection: "No active connection",
       connectOnHomePage: "Connect your device on the home page to get started",
     },
@@ -102,7 +111,8 @@ const enResources = {
       waiting: "Waiting",
       unknown: "Unknown Device",
       connectionRequired: "Device Connection Required",
-      pleaseConnectFirst: "Please connect your hardware device before performing operations",
+      pleaseConnectFirst:
+        "Please connect your hardware device before performing operations",
       noActiveConnection: "No active connection",
       connectOnHomePage: "Connect your device on the home page to get started",
     },
@@ -213,7 +223,8 @@ const enResources = {
       noLogsDesc: "Connect your device and perform operations to see logs here",
       executeOperation: "Execute Operation",
       deviceLogs: "Device Operation Logs",
-      deviceLogsDesc: "Display recent device operation records, including connections, signatures and error messages",
+      deviceLogsDesc:
+        "Display recent device operation records, including connections, signatures and error messages",
     },
     deviceConnector: {
       title: "Connect Device",
@@ -250,7 +261,8 @@ const enResources = {
       instruction: "Enter your device PIN",
       enterPin: "Enter PIN",
       enterPinWeb: "Enter PIN on Web",
-      webInputInstruction: "Your device supports secure PIN input on the web, which is more convenient and faster",
+      webInputInstruction:
+        "Your device supports secure PIN input on the web, which is more convenient and faster",
       webSubmit: "Web Confirm",
       confirmPin: "Confirm PIN",
       pinRequired: "PIN is required for this operation",
@@ -267,17 +279,19 @@ const enResources = {
       confirmPassphrase: "Confirm Passphrase",
       passphraseOptional: "Passphrase is optional for additional security",
       enablePassphrase: "Enable passphrase protection",
-      disablePassphrase: "Disable passphrase protection", 
+      disablePassphrase: "Disable passphrase protection",
       cancel: "Cancel",
       submit: "Submit",
       deviceInput: "Use device input",
       webInput: "Use web input",
       showPassphrase: "Show passphrase",
       hidePassphrase: "Hide passphrase",
-      passphraseInfo: "Passphrase adds an extra layer of security to your wallet",
+      passphraseInfo:
+        "Passphrase adds an extra layer of security to your wallet",
       placeholder: "Enter passphrase",
       confirmPlaceholder: "Re-enter passphrase",
-      saveToSession: "Keep accessible. Hidden wallets remain after closing the app",
+      saveToSession:
+        "Keep accessible. Hidden wallets remain after closing the app",
       inputOnDevice: "Enter on device",
       useDevice: "Use device input",
       deviceInputDescription: "Passphrase will be securely entered on device",
@@ -327,7 +341,7 @@ const zhResources = {
       confirm: "确认",
       deviceManagement: "设备管理",
       deviceManagementDesc: "设备状态查询、配置和管理操作",
-      basicOperations: "基本操作", 
+      basicOperations: "基本操作",
       basicOperationsDesc: "基本设备连接和通信操作",
       cancel: "取消",
       error: "错误",
@@ -542,14 +556,14 @@ const zhResources = {
       title: "输入passPhrase",
       instruction: "请输入设备的passPhrase（可选）",
       enterPassphrase: "输入passPhrase",
-      confirmPassphrase: "确认passPhrase", 
+      confirmPassphrase: "确认passPhrase",
       passphraseOptional: "passPhrase是可选的额外安全保护",
       enablePassphrase: "启用passPhrase保护",
       disablePassphrase: "禁用passPhrase保护",
       cancel: "取消",
       submit: "提交",
       deviceInput: "使用设备输入",
-      webInput: "使用网页输入", 
+      webInput: "使用网页输入",
       showPassphrase: "显示passPhrase",
       hidePassphrase: "隐藏passPhrase",
       passphraseInfo: "passPhrase为您的钱包增加额外的安全层",
@@ -583,7 +597,7 @@ const i18nConfig: InitOptions = {
 
 // Initialize i18n (client-side only)
 if (typeof window !== "undefined") {
-  i18n.use(LanguageDetector).use(initReactI18next).init(i18nConfig);
+  use(LanguageDetector).use(initReactI18next).init(i18nConfig);
 }
 
 export default i18n;

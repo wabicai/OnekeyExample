@@ -9,8 +9,7 @@ import {
 } from "../../services/hardwareService";
 import { DeviceInfo } from "../../types/hardware";
 import { Button } from "../ui/Button";
-import { Monitor, Signal, ExternalLink, Info } from "lucide-react";
-import { Usb } from "lucide-react";
+import { Monitor, Signal, ExternalLink, Info, Usb } from "lucide-react";
 
 interface TransportSwitcherProps {
   className?: string;

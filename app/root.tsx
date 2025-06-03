@@ -4,7 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import MainLayout from "./components/layout/MainLayout";
 
 // Providers
-import I18nProvider from "./i18n/i18n-provider";
+import { I18nProvider } from "./i18n/i18n-provider";
 import { SDKProvider } from "./components/providers/SDKProvider";
 
 // Toaster for global notifications

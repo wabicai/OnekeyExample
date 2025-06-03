@@ -58,10 +58,10 @@ const DeviceInteractionArea: React.FC<DeviceInteractionAreaProps> = ({
       case "device-interaction":
         return {
           icon: <Clock className="h-5 w-5 animate-pulse" />,
-          color: "text-orange-600",
-          bgColor: "bg-orange-50",
-          borderColor: "border-orange-200",
-          badgeColor: "bg-orange-100 text-orange-800 border-orange-300",
+          color: "text-green-600",
+          bgColor: "bg-green-50",
+          borderColor: "border-green-200",
+          badgeColor: "bg-green-100 text-green-800 border-green-300",
           message: "请在设备上确认操作",
         };
       case "success":
@@ -97,16 +97,16 @@ const DeviceInteractionArea: React.FC<DeviceInteractionAreaProps> = ({
   const statusConfig = getStatusConfig();
 
   return (
-    <Card className="bg-card border border-border/50 shadow-sm min-h-[600px] flex flex-col">
-      <CardHeader className="pb-1">
+    <Card className="bg-card border border-border/50 shadow-sm h-full flex flex-col">
+      <CardHeader className="pb-1 flex-shrink-0">
         <CardTitle className="text-sm text-foreground flex items-center justify-between">
           期望的用户体验：
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col">
+      <CardContent className="flex-1 flex flex-col min-h-0">
         <div className="flex flex-col items-center justify-center h-full">
           {/* 设备展示区域 - 占用更多空间 */}
-          <div className="flex-1 w-full flex items-center justify-center min-h-96 mb-6">
+          <div className="flex-1 w-full flex items-center justify-center min-h-0 mb-6">
             {deviceAction ? (
               <div className="w-100 h-100">
                 <DeviceActionAnimation
@@ -140,7 +140,7 @@ const DeviceInteractionArea: React.FC<DeviceInteractionAreaProps> = ({
           </div>
 
           {/* 执行控制按钮 - 并排布局，恢复文字 */}
-          <div className="w-full grid grid-cols-2 gap-4">
+          <div className="w-full grid grid-cols-2 gap-4 flex-shrink-0">
             <Button
               onClick={onExecute}
               disabled={status === "loading" || status === "device-interaction"}

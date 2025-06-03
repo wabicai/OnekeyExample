@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { I18nextProvider } from "react-i18next";
+import { I18nextProvider, initReactI18next } from "react-i18next";
 import i18n, { i18nConfig } from "./config";
 import LanguageDetector from "i18next-browser-languagedetector";
-import { initReactI18next } from "react-i18next";
 
 interface I18nProviderProps {
   children: React.ReactNode;
@@ -31,5 +30,3 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
 
   return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
 };
-
-export default I18nProvider;

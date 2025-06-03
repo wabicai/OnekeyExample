@@ -41,30 +41,35 @@ const DeviceMethodExecutePage: React.FC = () => {
       checkNotFound={isMethodNotFound}
     >
       {selectedMethod && (
-        <PageLayout>
-          <div className="min-h-screen bg-background">
-            <div className="mx-auto px-6 py-4 space-y-4">
-              {/* 面包屑导航 */}
-              <Breadcrumb
-                items={[
-                  {
-                    label: "Device Methods",
-                    href: "/device-methods",
-                    icon: Cpu,
-                  },
-                  { label: selectedMethod.method, icon: Settings },
-                ]}
-              />
-
-              {/* 执行器 */}
-              {!currentDevice ? (
-                <DeviceNotConnectedState showFullPage={true} />
-              ) : (
-                <MethodExecutor
-                  methodConfig={selectedMethod}
-                  executionHandler={handleMethodExecution}
+        <PageLayout fixedHeight={true}>
+          <div className="h-full flex flex-col">
+            <div className="flex-1 flex flex-col px-4 py-2 min-h-0">
+              {/* 面包屑导航 - 固定高度 */}
+              <div className="flex-shrink-0 mb-3">
+                <Breadcrumb
+                  items={[
+                    {
+                      label: "Device Methods",
+                      href: "/device-methods",
+                      icon: Cpu,
+                    },
+                    { label: selectedMethod.method, icon: Settings },
+                  ]}
                 />
-              )}
+              </div>
+
+              {/* 执行器 - 填充剩余空间 */}
+              <div className="flex-1 min-h-0">
+                {!currentDevice ? (
+                  <DeviceNotConnectedState showFullPage={true} />
+                ) : (
+                  <MethodExecutor
+                    methodConfig={selectedMethod}
+                    executionHandler={handleMethodExecution}
+                    className="h-full"
+                  />
+                )}
+              </div>
             </div>
           </div>
         </PageLayout>

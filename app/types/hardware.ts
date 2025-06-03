@@ -34,7 +34,7 @@ export interface DeviceDisplayInfo {
 
 export interface ApiResponse {
   success: boolean;
-  payload?: any;
+  payload?: Record<string, unknown>;
   error?: string;
 }
 
@@ -43,7 +43,7 @@ export interface LogEntry {
   timestamp: string;
   type: "info" | "error" | "request" | "response";
   message: string;
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 export interface UIEventMessage {

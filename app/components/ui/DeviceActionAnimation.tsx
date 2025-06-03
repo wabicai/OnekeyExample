@@ -26,7 +26,7 @@ export type DeviceModel = "classic" | "mini" | "pro" | "touch";
 export type ThemeType = "light" | "dark";
 
 // Lottie动画数据类型
-type LottieAnimationData = Record<string, any>;
+type LottieAnimationData = Record<string, unknown>;
 
 interface DeviceActionAnimationProps {
   action: AnimationType;
@@ -127,14 +127,20 @@ const DeviceActionAnimation: React.FC<DeviceActionAnimationProps> = ({
   if (!getAnimationData()) {
     return (
       <div className={`flex flex-col items-center justify-center ${className}`}>
-        <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-          <div className="text-gray-400 text-2xl">📱</div>
+        <div className="w-24 h-24 bg-gradient-to-br from-primary/10 to-primary/20 rounded-xl flex items-center justify-center mb-4 border border-primary/20">
+          <div className="text-primary text-3xl">
+            {action === "confirm" && "✨"}
+            {action === "passphrase" && "🔐"}
+            {action === "inputPin" && "🎯"}
+          </div>
         </div>
         <div className="text-center">
-          <p className="text-sm font-medium text-gray-900 mb-1">
+          <p className="text-sm font-medium text-foreground mb-1">
             {getDeviceName()}
           </p>
-          <p className="text-xs text-gray-600">{getActionDescription()}</p>
+          <p className="text-xs text-muted-foreground">
+            {getActionDescription()}
+          </p>
         </div>
       </div>
     );
@@ -156,10 +162,12 @@ const DeviceActionAnimation: React.FC<DeviceActionAnimationProps> = ({
         />
       </div>
       <div className="text-center mt-4">
-        <p className="text-sm font-medium text-gray-900 mb-1">
+        <p className="text-sm font-medium text-foreground mb-1">
           {getDeviceName()}
         </p>
-        <p className="text-xs text-gray-600">{getActionDescription()}</p>
+        <p className="text-xs text-muted-foreground">
+          {getActionDescription()}
+        </p>
       </div>
     </div>
   );

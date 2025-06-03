@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
 import { Button } from "../ui/Button";
-import { Badge } from "../ui/Badge";
 import { useHardwareStore } from "~/store/hardwareStore";
 import {
   Dialog,
@@ -11,8 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/Dialog";
-import { Alert, AlertDescription } from "../ui/Alert";
-import { Copy, Check, AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import type { DeviceModel, ThemeType } from "../ui/DeviceActionAnimation";
 import { useDeviceStore } from "../../store/deviceStore";
 import { useToast } from "../../hooks/use-toast";
@@ -23,11 +20,14 @@ import { getSDKInstance } from "~/services/hardwareService";
 // 导入子组件
 import ParameterInput from "./ParameterInput";
 import DeviceInteractionArea from "./DeviceInteractionArea";
-import JsonEditor from "./JsonEditor";
+import ExecutionPanel from "./ExecutionPanel";
+import { LogEntry, LogType } from "./ExecutionLogger";
 
 export interface MethodExecutorProps {
   methodConfig: MethodConfig;
-  executionHandler: (params: Record<string, unknown>) => Promise<unknown>;
+  executionHandler: (
+    params: Record<string, unknown>
+  ) => Promise<Record<string, unknown>>;
   onResult?: (result: unknown) => void;
   onError?: (error: string) => void;
   className?: string;
@@ -58,15 +58,13 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
   // 执行状态
   const [status, setStatus] = useState<ExecutionStatus>("idle");
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
-  const [result, setResult] = useState<unknown>(null);
-  const [error, setError] = useState<string | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [localDeviceAction, setLocalDeviceAction] = useState<{
     actionType: DeviceActionType;
     deviceInfo?: unknown;
   } | null>(null);
-  const [copied, setCopied] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [executionLogs, setExecutionLogs] = useState<LogEntry[]>([]);
 
   // 获取方法的所有参数，从预设中推断（因为新的 MethodConfig 没有 parameters 字段）
   const getAllParametersFromPresets = (): Array<{
@@ -143,29 +141,24 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
 
   // 监听全局设备动作状态
   useEffect(() => {
-    if (
-      globalDeviceAction.isActive &&
-      globalDeviceAction.actionType &&
-      status === "loading"
-    ) {
+    if (globalDeviceAction.isActive && globalDeviceAction.actionType) {
       console.log(
         "🎯 [MethodExecutor] 设备交互开始:",
         globalDeviceAction.actionType
       );
+      // 添加硬件交互日志
+      addLog(
+        "hardware",
+        "设备交互开始",
+        null,
+        `等待设备操作: ${globalDeviceAction.actionType}`
+      );
+
       setStatus("device-interaction");
       setLocalDeviceAction({
         actionType: globalDeviceAction.actionType,
         deviceInfo: globalDeviceAction.deviceInfo,
       });
-    } else if (!globalDeviceAction.isActive) {
-      // 设备动作被清除
-      if (status === "device-interaction") {
-        // 如果当前正在设备交互中，说明可能是PIN错误或操作被取消
-        console.log("⚠️ [MethodExecutor] 设备交互被中断，重置状态到错误");
-        setStatus("error");
-        setError("操作被中断或PIN输入错误");
-      }
-      setLocalDeviceAction(null);
     }
   }, [globalDeviceAction, status]);
 
@@ -242,10 +235,6 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
 
   const performExecution = async () => {
     setStatus("loading");
-    setError(null);
-    setResult(null);
-    setLocalDeviceAction(null);
-    setShowConfirmDialog(false);
 
     try {
       const startTime = Date.now();
@@ -253,12 +242,19 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
       // 🔥 使用 hardwareStore 计算的最终执行参数
       const executionParams = getExecutionParameters();
 
+      // 添加请求日志
+      addLog(
+        "request",
+        `${methodConfig.method} 开始`,
+        executionParams,
+        `开始执行 ${methodConfig.method}`
+      );
+
       console.log("[MethodExecutor] 🚀 执行参数:", executionParams);
 
       const execResult = await executionHandler(executionParams);
       const duration = Date.now() - startTime;
 
-      setResult(execResult);
       setStatus("success");
       setLocalDeviceAction(null);
 
@@ -268,9 +264,16 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
       });
 
       onResult?.(execResult);
+
+      // 添加日志条目
+      addLog(
+        "response",
+        "执行成功",
+        execResult,
+        `${methodConfig.method} 执行完成 (${duration}ms)`
+      );
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "执行失败";
-      setError(errorMessage);
       setStatus("error");
       setLocalDeviceAction(null);
 
@@ -281,6 +284,9 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
       });
 
       onError?.(errorMessage);
+
+      // 添加日志条目
+      addLog("error", "执行失败", null, errorMessage);
     }
   };
 
@@ -328,38 +334,14 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
 
     // 重置UI状态
     setStatus("idle");
-    setError(null);
-    setResult(null);
-    setLocalDeviceAction(null);
+
+    // 清除日志
+    clearLogs();
   };
 
   // 处理JSON编辑
   const handleRequestParamsEdit = (data: Record<string, unknown>) => {
     setMethodParameters(data);
-  };
-
-  // 复制执行结果
-  const handleCopyResult = async () => {
-    if (result !== null && result !== undefined) {
-      try {
-        const resultText =
-          typeof result === "string" ? result : JSON.stringify(result, null, 2);
-        await navigator.clipboard.writeText(resultText);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-        toast({
-          title: "复制成功",
-          description: "执行结果已复制到剪贴板",
-        });
-      } catch (err) {
-        console.error("复制失败:", err);
-        toast({
-          title: "复制失败",
-          description: "无法复制到剪贴板",
-          variant: "warning",
-        });
-      }
-    }
   };
 
   // 根据设备信息获取设备型号
@@ -385,129 +367,71 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
     return "light";
   };
 
+  // 添加日志条目
+  const addLog = (
+    type: LogType,
+    title: string,
+    content?: string | Record<string, unknown> | null,
+    description?: string
+  ) => {
+    const logEntry: LogEntry = {
+      id: `${Date.now()}-${Math.random()}`,
+      timestamp: new Date(),
+      type,
+      title,
+      content,
+      description,
+    };
+    setExecutionLogs((prev) => [...prev, logEntry]);
+  };
+
+  // 清除日志
+  const clearLogs = () => {
+    setExecutionLogs([]);
+  };
+
   return (
-    <div className={`space-y-2 ${className}`}>
-      {/* 采用上下+左右复合布局 */}
-      <div className="space-y-3">
-        {/* 上半部分：执行参数区域 */}
-        <ParameterInput
-          methodConfig={methodConfig}
-          selectedPreset={selectedPreset}
-          onPresetChange={handlePresetChange}
-        />
+    <div className={`h-full flex flex-col ${className}`}>
+      {/* 紧凑的布局，充分利用空间 */}
+      <div className="h-full flex flex-col space-y-3">
+        {/* 上半部分：执行参数区域 - 自适应高度 */}
+        <div className="flex-shrink-0">
+          <ParameterInput
+            methodConfig={methodConfig}
+            selectedPreset={selectedPreset}
+            onPresetChange={handlePresetChange}
+          />
+        </div>
 
-        {/* 下半部分：左右布局 */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          {/* 左侧：设备交互 */}
-          <div className="lg:col-span-4 flex flex-col">
-            <DeviceInteractionArea
-              status={status}
-              deviceAction={localDeviceAction}
-              deviceModel={getDeviceModel()}
-              deviceTheme={getDeviceTheme()}
-              onExecute={executeMethod}
-              onReset={handleReset}
-              isCancelling={isCancelling}
-            />
-          </div>
+        {/* 下半部分：主要内容区域 - 限制最大高度 */}
+        <div className="flex-1 min-h-0 max-h-[650px]">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full">
+            {/* 左侧：设备交互 - 固定宽度 */}
+            <div className="lg:col-span-4 flex flex-col">
+              <DeviceInteractionArea
+                status={status}
+                deviceAction={localDeviceAction}
+                deviceModel={getDeviceModel()}
+                deviceTheme={getDeviceTheme()}
+                onExecute={executeMethod}
+                onReset={handleReset}
+                isCancelling={isCancelling}
+              />
+            </div>
 
-          {/* 右侧：请求参数和执行结果 */}
-          <div className="lg:col-span-8 space-y-4">
-            {/* 请求参数 */}
-            <Card className="bg-card border border-border/50 shadow-sm min-h-72">
-              <CardContent className="pt-6">
-                <JsonEditor
-                  data={getExecutionParameters()}
-                  onSave={handleRequestParamsEdit}
-                  title="请求参数"
-                  disabled={
-                    status === "loading" || status === "device-interaction"
-                  }
-                />
-              </CardContent>
-            </Card>
-
-            {/* 执行结果 */}
-            <Card className="bg-card border border-border/50 shadow-sm min-h-72">
-              <CardHeader className="pb-1">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm text-foreground">
-                    执行结果
-                  </CardTitle>
-                  {result !== null && result !== undefined && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleCopyResult}
-                      className="h-7 px-2 text-xs hover:bg-primary/10 hover:border-primary/30"
-                    >
-                      {copied ? (
-                        <>
-                          <Check className="h-3 w-3 mr-1 text-green-600" />
-                          已复制
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="h-3 w-3 mr-1" />
-                          复制
-                        </>
-                      )}
-                    </Button>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent>
-                {result !== null && result !== undefined && (
-                  <div className="space-y-3">
-                    <Badge
-                      variant="secondary"
-                      className="bg-primary/10 text-primary border-primary/20"
-                    >
-                      成功
-                    </Badge>
-                    <pre className="bg-muted/30 p-4 rounded-lg text-xs overflow-auto max-h-96 border border-border/30 text-foreground font-mono">
-                      {(() => {
-                        try {
-                          return typeof result === "string"
-                            ? result
-                            : JSON.stringify(result, null, 2);
-                        } catch {
-                          return String(result);
-                        }
-                      })()}
-                    </pre>
-                  </div>
-                )}
-
-                {error && (
-                  <div className="space-y-3">
-                    <Badge
-                      variant="secondary"
-                      className="bg-orange-100 text-orange-700 border-orange-300"
-                    >
-                      失败
-                    </Badge>
-                    <Alert
-                      variant="warning"
-                      className="border-orange-200 bg-orange-50"
-                    >
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertDescription className="text-orange-800">
-                        {error}
-                      </AlertDescription>
-                    </Alert>
-                  </div>
-                )}
-
-                {!result && !error && (
-                  <div className="bg-muted/20 p-10 rounded-lg text-center">
-                    <p className="text-muted-foreground text-sm">
-                      暂无执行结果
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            {/* 右侧：执行面板（请求参数 + 执行日志） - 填充剩余空间 */}
+            <div className="lg:col-span-8 flex flex-col min-h-0">
+              <ExecutionPanel
+                requestData={getExecutionParameters()}
+                onSaveRequest={handleRequestParamsEdit}
+                logs={executionLogs}
+                onClearLogs={clearLogs}
+                disabled={
+                  status === "loading" || status === "device-interaction"
+                }
+                className="h-full"
+              />
+            </div>
           </div>
         </div>
       </div>
