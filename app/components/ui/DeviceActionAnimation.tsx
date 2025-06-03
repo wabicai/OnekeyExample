@@ -15,9 +15,10 @@ import enterPinOnMini from "../../assets/animation/enter-pin-on-mini.json";
 import enterPinOnProLight from "../../assets/animation/enter-pin-on-pro-light.json";
 import enterPinOnProDark from "../../assets/animation/enter-pin-on-pro-dark.json";
 import enterPinOnTouch from "../../assets/animation/enter-pin-on-touch.json";
+import { UI_REQUEST, UiEvent } from "@onekeyfe/hd-core";
 
 // 动效类型
-export type AnimationType = "confirm" | "passphrase" | "inputPin";
+export type AnimationType = UiEvent["type"];
 
 // 设备型号
 export type DeviceModel = "classic" | "mini" | "pro" | "touch";
@@ -50,7 +51,7 @@ const DeviceActionAnimation: React.FC<DeviceActionAnimationProps> = ({
   // 获取对应的动画数据
   const getAnimationData = (): LottieAnimationData | null => {
     switch (action) {
-      case "confirm":
+      case UI_REQUEST.REQUEST_BUTTON:
         switch (deviceModel) {
           case "classic":
             return confirmOnClassic;
@@ -63,7 +64,8 @@ const DeviceActionAnimation: React.FC<DeviceActionAnimationProps> = ({
         }
         break;
 
-      case "passphrase":
+      case UI_REQUEST.REQUEST_PASSPHRASE:
+      case UI_REQUEST.REQUEST_PASSPHRASE_ON_DEVICE:
         switch (deviceModel) {
           case "classic":
             return enterPassphraseOnClassic;
@@ -78,7 +80,8 @@ const DeviceActionAnimation: React.FC<DeviceActionAnimationProps> = ({
         }
         break;
 
-      case "inputPin":
+      case UI_REQUEST.REQUEST_PIN:
+      case UI_REQUEST.REQUEST_DEVICE_IN_BOOTLOADER_FOR_WEB_DEVICE:
         switch (deviceModel) {
           case "classic":
             return enterPinOnClassic;
@@ -97,11 +100,11 @@ const DeviceActionAnimation: React.FC<DeviceActionAnimationProps> = ({
   // 获取动效描述文本
   const getActionDescription = () => {
     switch (action) {
-      case "confirm":
+      case UI_REQUEST.REQUEST_BUTTON:
         return "请在设备上确认操作";
-      case "passphrase":
+      case UI_REQUEST.REQUEST_PASSPHRASE:
         return "请在设备上输入密语";
-      case "inputPin":
+      case UI_REQUEST.REQUEST_PIN:
         return "请在设备上输入PIN码";
       default:
         return "请在设备上操作";
@@ -129,9 +132,9 @@ const DeviceActionAnimation: React.FC<DeviceActionAnimationProps> = ({
       <div className={`flex flex-col items-center justify-center ${className}`}>
         <div className="w-24 h-24 bg-gradient-to-br from-primary/10 to-primary/20 rounded-xl flex items-center justify-center mb-4 border border-primary/20">
           <div className="text-primary text-3xl">
-            {action === "confirm" && "✨"}
-            {action === "passphrase" && "🔐"}
-            {action === "inputPin" && "🎯"}
+            {action === UI_REQUEST.REQUEST_BUTTON && "✨"}
+            {action === UI_REQUEST.REQUEST_PASSPHRASE && "🔐"}
+            {action === UI_REQUEST.REQUEST_PIN && "🎯"}
           </div>
         </div>
         <div className="text-center">

@@ -12,7 +12,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import type { DeviceModel, ThemeType } from "../ui/DeviceActionAnimation";
-import * as hardwareService from "../../services/hardwareService";
+import { UiEvent } from "@onekeyfe/hd-core";
 
 type ExecutionStatus =
   | "idle"
@@ -24,7 +24,7 @@ type ExecutionStatus =
 interface DeviceInteractionAreaProps {
   status: ExecutionStatus;
   deviceAction?: {
-    actionType: hardwareService.DeviceActionType;
+    actionType: UiEvent["type"];
     deviceInfo?: unknown;
   } | null;
   deviceModel: DeviceModel;

@@ -176,10 +176,10 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter>
-        <div className="px-4 py-3">
-          <div className="text-sm text-muted-foreground">
-            <div className="font-medium">OneKey SDK Demo v1.0.0</div>
-            <div className="mt-1">© 2024 OneKey</div>
+        <div className="py-2 w-full">
+          <div className="text-sm text-muted-foreground w-full text-center">
+            <div className="font-medium">OneKey SDK v1.0.0</div>
+            <div className="mt-1">© 2025 OneKey</div>
           </div>
         </div>
       </SidebarFooter>

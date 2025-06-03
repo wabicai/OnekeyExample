@@ -3,8 +3,9 @@ import { useDeviceStore } from "../store/deviceStore";
 // Log types
 export type LogType = "info" | "error" | "request" | "response";
 
+export type logData = Record<string, unknown> | undefined;
 // Create a log entry
-export function createLogEntry(type: LogType, message: string, data?: unknown) {
+export function createLogEntry(type: LogType, message: string, data?: logData) {
   return {
     id: Date.now().toString(),
     timestamp: new Date().toISOString(),
@@ -15,7 +16,7 @@ export function createLogEntry(type: LogType, message: string, data?: unknown) {
 }
 
 // Log information
-export function logInfo(message: string, data?: unknown) {
+export function logInfo(message: string, data?: logData) {
   console.info(`[INFO] ${message}`, data || "");
   // Only add to store if in browser environment
   try {
@@ -27,7 +28,7 @@ export function logInfo(message: string, data?: unknown) {
 }
 
 // Log errors
-export function logError(message: string, data?: unknown) {
+export function logError(message: string, data?: logData) {
   console.error(`[ERROR] ${message}`, data || "");
   try {
     const store = useDeviceStore.getState();
@@ -38,7 +39,7 @@ export function logError(message: string, data?: unknown) {
 }
 
 // Log requests
-export function logRequest(message: string, data?: unknown) {
+export function logRequest(message: string, data?: logData) {
   console.info(`[REQUEST] ${message}`, data || "");
   try {
     const store = useDeviceStore.getState();
@@ -49,7 +50,7 @@ export function logRequest(message: string, data?: unknown) {
 }
 
 // Log responses
-export function logResponse(message: string, data?: unknown) {
+export function logResponse(message: string, data?: logData) {
   console.info(`[RESPONSE] ${message}`, data || "");
   try {
     const store = useDeviceStore.getState();

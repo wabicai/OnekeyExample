@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Download, Trash2, FileText, Home } from "lucide-react";
 import { useDeviceStore } from "../store/deviceStore";
 import LogDisplay from "../components/common/LogDisplay";
@@ -14,7 +14,7 @@ const LogsPage: React.FC = () => {
   const { logs, clearLogs } = useDeviceStore();
   const { t } = useTranslation();
 
-  const handleExportLogs = () => {
+  const handleExportLogs = useCallback(() => {
     if (logs.length === 0) {
       return;
     }
@@ -42,7 +42,7 @@ const LogsPage: React.FC = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  };
+  }, [logs]);
 
   const breadcrumbItems = [{ label: "System Logs", icon: FileText }];
 
@@ -126,7 +126,7 @@ const LogsPage: React.FC = () => {
                 </CardContent>
               </Card>
             ) : (
-              /* 日志显示 - 使用简化的LogDisplay，不显示重复的头部 */
+              /* 日志显示 - 使用优化后的LogDisplay */
               <div className="h-[calc(100vh-220px)] min-h-[500px]">
                 <LogDisplay
                   showFilters={true}

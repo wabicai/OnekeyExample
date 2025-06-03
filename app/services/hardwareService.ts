@@ -7,7 +7,6 @@ import { logError, logRequest, logResponse, logInfo } from "../utils/logger";
 // 使用 hd-core 的标准类型
 export type ApiResponse<T = any> = Success<T> | Unsuccessful;
 export type TransportType = "webusb" | "jsbridge";
-export type DeviceActionType = "confirm" | "passphrase" | "inputPin";
 export type HardwareApiMethod = keyof CoreApi;
 
 // 扩展 Navigator 类型以支持 WebUSB
@@ -87,7 +86,7 @@ export async function submitPin(pin: string | null): Promise<void> {
     });
     logResponse("PIN response submitted successfully");
   } catch (error) {
-    logError("Failed to submit PIN response", error);
+    logError("Failed to submit PIN response", { error });
     throw error;
   }
 }
@@ -112,7 +111,7 @@ export async function submitPassphrase(
     });
     logResponse("Passphrase response submitted successfully");
   } catch (error) {
-    logError("Failed to submit passphrase response", error);
+    logError("Failed to submit passphrase response", { error });
     throw error;
   }
 }
@@ -276,8 +275,7 @@ export async function callHardwareAPI(
             logInfo("Device passphrase protection not enabled");
           }
         } catch (passphraseError) {
-          logError("Failed to get passphrase state", passphraseError);
-          // 继续执行，不要因为passphraseState检查失败而中断
+          logError("Failed to get passphrase state");
         }
       } else {
         logInfo(`Using existing passphrase state: ${params.passphraseState}`);
@@ -298,10 +296,7 @@ export async function callHardwareAPI(
     if (result.success) {
       logResponse(`Hardware API call successful: ${method}`, result.payload);
     } else {
-      logError(
-        `Hardware API call failed: ${method}`,
-        (result as Unsuccessful).payload.error
-      );
+      logError(`Hardware API call failed: ${method}`, result.payload);
     }
 
     return result;
@@ -357,7 +352,9 @@ export async function searchDevices(): Promise<ApiResponse> {
           payload: { error },
         } as Unsuccessful;
       }
-      logError("WebUSB device permission failed", webUsbError);
+      logError("WebUSB device permission failed", {
+        webUsbError,
+      });
     }
   }
 

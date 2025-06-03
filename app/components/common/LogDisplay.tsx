@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useDeviceStore } from "../../store/deviceStore";
 import { LogEntry } from "../../types/hardware";
@@ -44,9 +44,12 @@ const LogDisplay: React.FC<LogDisplayProps> = ({
   const [filter, setFilter] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const handleClearLogs = () => {
+  const handleClearLogs = useCallback(() => {
     clearLogs();
-  };
+    // 清除日志后重置过滤器，避免混乱
+    setFilter("all");
+    setSearchTerm("");
+  }, [clearLogs]);
 
   const handleCopyLog = (log: LogEntry) => {
     const logText = `[${log.timestamp}] [${log.type.toUpperCase()}] ${
@@ -89,15 +92,15 @@ const LogDisplay: React.FC<LogDisplayProps> = ({
   const getLogClass = (type: string): string => {
     switch (type) {
       case "info":
-        return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800";
+        return "bg-blue-50/80 text-blue-700 border-blue-200/60 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800/50";
       case "error":
-        return "bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800";
+        return "bg-orange-50/80 text-orange-700 border-orange-200/60 dark:bg-orange-950/30 dark:text-orange-300 dark:border-orange-800/50";
       case "request":
-        return "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800";
+        return "bg-purple-50/80 text-purple-700 border-purple-200/60 dark:bg-purple-950/30 dark:text-purple-300 dark:border-purple-800/50";
       case "response":
-        return "bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800";
+        return "bg-green-50/80 text-green-700 border-green-200/60 dark:bg-green-950/30 dark:text-green-300 dark:border-green-800/50";
       default:
-        return "bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-950 dark:text-gray-300 dark:border-gray-800";
+        return "bg-gray-50/80 text-gray-700 border-gray-200/60 dark:bg-gray-950/30 dark:text-gray-300 dark:border-gray-800/50";
     }
   };
 
@@ -107,11 +110,11 @@ const LogDisplay: React.FC<LogDisplayProps> = ({
         return <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />;
       case "error":
         return (
-          <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+          <AlertCircle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
         );
       case "request":
         return (
-          <Send className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+          <Send className="h-4 w-4 text-purple-600 dark:text-purple-400" />
         );
       case "response":
         return <Inbox className="h-4 w-4 text-green-600 dark:text-green-400" />;
@@ -122,10 +125,15 @@ const LogDisplay: React.FC<LogDisplayProps> = ({
     }
   };
 
-  // 过滤和搜索日志
+  // 过滤和搜索日志 - 优化性能和稳定性
   const filteredAndSearchedLogs = useMemo(() => {
+    if (!logs || logs.length === 0) return [];
+
     return logs
       .filter((log) => {
+        // 确保log对象有效
+        if (!log || !log.type || !log.message) return false;
+
         // 类型过滤
         const typeMatch = filter === "all" || log.type === filter;
 
@@ -144,8 +152,18 @@ const LogDisplay: React.FC<LogDisplayProps> = ({
       .reverse(); // 最新的日志在前面
   }, [logs, filter, searchTerm]);
 
-  // 日志统计
+  // 日志统计 - 优化计算
   const logStats = useMemo(() => {
+    if (!logs || logs.length === 0) {
+      return {
+        all: 0,
+        info: 0,
+        error: 0,
+        request: 0,
+        response: 0,
+      };
+    }
+
     const stats = {
       all: logs.length,
       info: 0,
@@ -153,13 +171,37 @@ const LogDisplay: React.FC<LogDisplayProps> = ({
       request: 0,
       response: 0,
     };
+
     logs.forEach((log) => {
-      if (Object.prototype.hasOwnProperty.call(stats, log.type)) {
+      if (
+        log &&
+        log.type &&
+        Object.prototype.hasOwnProperty.call(stats, log.type)
+      ) {
         stats[log.type as keyof typeof stats]++;
       }
     });
     return stats;
   }, [logs]);
+
+  // 重置过滤器的处理函数
+  const handleFilterChange = useCallback(
+    (newFilter: string) => {
+      setFilter(newFilter);
+      // 如果切换到新类型且没有结果，可以考虑清除搜索
+      if (newFilter !== "all" && searchTerm) {
+        const hasResults = logs.some(
+          (log) =>
+            log.type === newFilter &&
+            log.message.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        if (!hasResults) {
+          setSearchTerm("");
+        }
+      }
+    },
+    [logs, searchTerm]
+  );
 
   return (
     <Card className="h-full flex flex-col bg-card border border-border/50 shadow-sm">
@@ -213,7 +255,7 @@ const LogDisplay: React.FC<LogDisplayProps> = ({
 
             {/* 类型过滤 */}
             {showFilters && (
-              <Select value={filter} onValueChange={setFilter}>
+              <Select value={filter} onValueChange={handleFilterChange}>
                 <SelectTrigger className="w-full sm:w-48 bg-background border-border">
                   <SelectValue placeholder="选择日志类型" />
                 </SelectTrigger>
@@ -221,25 +263,25 @@ const LogDisplay: React.FC<LogDisplayProps> = ({
                   <SelectItem value="all">所有类型 ({logStats.all})</SelectItem>
                   <SelectItem value="info">
                     <div className="flex items-center gap-2">
-                      <Info className="h-4 w-4 text-blue-600" />
+                      <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                       信息 ({logStats.info})
                     </div>
                   </SelectItem>
                   <SelectItem value="request">
                     <div className="flex items-center gap-2">
-                      <Send className="h-4 w-4 text-orange-600" />
+                      <Send className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                       请求 ({logStats.request})
                     </div>
                   </SelectItem>
                   <SelectItem value="response">
                     <div className="flex items-center gap-2">
-                      <Inbox className="h-4 w-4 text-green-600" />
+                      <Inbox className="h-4 w-4 text-green-600 dark:text-green-400" />
                       响应 ({logStats.response})
                     </div>
                   </SelectItem>
                   <SelectItem value="error">
                     <div className="flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4 text-red-600" />
+                      <AlertCircle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                       错误 ({logStats.error})
                     </div>
                   </SelectItem>
@@ -267,7 +309,7 @@ const LogDisplay: React.FC<LogDisplayProps> = ({
 
             {/* 类型过滤 */}
             {showFilters && (
-              <Select value={filter} onValueChange={setFilter}>
+              <Select value={filter} onValueChange={handleFilterChange}>
                 <SelectTrigger className="w-full sm:w-48 bg-background border-border">
                   <SelectValue placeholder="选择日志类型" />
                 </SelectTrigger>
@@ -275,25 +317,25 @@ const LogDisplay: React.FC<LogDisplayProps> = ({
                   <SelectItem value="all">所有类型 ({logStats.all})</SelectItem>
                   <SelectItem value="info">
                     <div className="flex items-center gap-2">
-                      <Info className="h-4 w-4 text-blue-600" />
+                      <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                       信息 ({logStats.info})
                     </div>
                   </SelectItem>
                   <SelectItem value="request">
                     <div className="flex items-center gap-2">
-                      <Send className="h-4 w-4 text-orange-600" />
+                      <Send className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                       请求 ({logStats.request})
                     </div>
                   </SelectItem>
                   <SelectItem value="response">
                     <div className="flex items-center gap-2">
-                      <Inbox className="h-4 w-4 text-green-600" />
+                      <Inbox className="h-4 w-4 text-green-600 dark:text-green-400" />
                       响应 ({logStats.response})
                     </div>
                   </SelectItem>
                   <SelectItem value="error">
                     <div className="flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4 text-red-600" />
+                      <AlertCircle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                       错误 ({logStats.error})
                     </div>
                   </SelectItem>

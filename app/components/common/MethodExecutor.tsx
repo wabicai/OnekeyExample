@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "../ui/Button";
 import { useHardwareStore } from "~/store/hardwareStore";
 import {
@@ -13,7 +13,6 @@ import { AlertTriangle } from "lucide-react";
 import type { DeviceModel, ThemeType } from "../ui/DeviceActionAnimation";
 import { useDeviceStore } from "../../store/deviceStore";
 import { useToast } from "../../hooks/use-toast";
-import type { DeviceActionType } from "../../services/hardwareService";
 import type { MethodConfig, ExecutionStatus } from "~/data/types";
 import { getSDKInstance } from "~/services/hardwareService";
 
@@ -22,6 +21,7 @@ import ParameterInput from "./ParameterInput";
 import DeviceInteractionArea from "./DeviceInteractionArea";
 import ExecutionPanel from "./ExecutionPanel";
 import { LogEntry, LogType } from "./ExecutionLogger";
+import { UiEvent } from "@onekeyfe/hd-core";
 
 export interface MethodExecutorProps {
   methodConfig: MethodConfig;
@@ -60,19 +60,15 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [localDeviceAction, setLocalDeviceAction] = useState<{
-    actionType: DeviceActionType;
+    actionType: UiEvent["type"];
     deviceInfo?: unknown;
   } | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
   const [executionLogs, setExecutionLogs] = useState<LogEntry[]>([]);
 
-  // 获取方法的所有参数，从预设中推断（因为新的 MethodConfig 没有 parameters 字段）
-  const getAllParametersFromPresets = (): Array<{
-    name: string;
-    type: string;
-    required: boolean;
-    default?: unknown;
-  }> => {
+  // 使用 useMemo 缓存 allParameters，避免无限渲染
+  const allParameters = useMemo(() => {
+    // 获取方法的所有参数，从预设中推断（因为新的 MethodConfig 没有 parameters 字段）
     if (!methodConfig.presets || methodConfig.presets.length === 0) {
       return [];
     }
@@ -88,21 +84,9 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
       name,
       type: "string", // 默认类型
       required: false, // 默认非必需
+      default: undefined, // 添加 default 属性
     }));
-  };
-
-  const allParameters = getAllParametersFromPresets();
-
-  // 获取默认参数值
-  const getDefaultParams = (): Record<string, unknown> => {
-    const defaultParams: Record<string, unknown> = {};
-    allParameters.forEach((param) => {
-      if (param.default !== undefined) {
-        defaultParams[param.name] = param.default;
-      }
-    });
-    return defaultParams;
-  };
+  }, [methodConfig.presets]);
 
   // 初始化参数值
   useEffect(() => {
@@ -110,19 +94,16 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
     console.log("[MethodExecutor] 🔄 方法变化，重置参数:", methodConfig.method);
     resetMethodParameters();
 
-    const defaultParams = getDefaultParams();
-
     // 自动选择第一个预设
     if (methodConfig.presets && methodConfig.presets.length > 0) {
       const firstPreset = methodConfig.presets[0];
       setSelectedPreset(firstPreset.title);
 
-      // 🔥 完全替换参数：只使用预设值，加上必要的默认值
-      const presetParams = { ...defaultParams, ...firstPreset.value };
+      // 🔥 直接使用预设值，因为目前没有实际的默认值
+      const presetParams = { ...firstPreset.value };
 
       console.log("[MethodExecutor] 📋 初始化参数:", {
         方法名称: methodConfig.method,
-        默认参数: defaultParams,
         预设参数: firstPreset.value,
         最终参数: presetParams,
       });
@@ -130,14 +111,13 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
       setMethodParameters(presetParams);
     } else {
       setSelectedPreset(null);
-      setMethodParameters(defaultParams);
+      setMethodParameters({});
 
-      console.log("[MethodExecutor] 📋 无预设，使用默认参数:", {
+      console.log("[MethodExecutor] 📋 无预设，使用空参数:", {
         方法名称: methodConfig.method,
-        默认参数: defaultParams,
       });
     }
-  }, [methodConfig, setMethodParameters, resetMethodParameters]);
+  }, [methodConfig, setMethodParameters, resetMethodParameters, allParameters]);
 
   // 监听全局设备动作状态
   useEffect(() => {
@@ -168,13 +148,11 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
     if (preset) {
       setSelectedPreset(presetTitle);
 
-      // 🔥 完全替换参数：先获取默认值，再应用预设值
-      const defaultParams = getDefaultParams();
-      const newParams = { ...defaultParams, ...preset.value };
+      // 🔥 直接使用预设值，因为目前没有实际的默认值
+      const newParams = { ...preset.value };
 
       console.log("[MethodExecutor] 🔄 切换预设:", {
         预设名称: presetTitle,
-        默认参数: defaultParams,
         预设参数: preset.value,
         最终参数: newParams,
       });

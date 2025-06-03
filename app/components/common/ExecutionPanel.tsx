@@ -103,37 +103,41 @@ const ExecutionPanel: React.FC<ExecutionPanelProps> = ({
       case "request":
         return {
           icon: "📋",
-          color: "text-blue-600",
-          bgColor: "bg-blue-50",
-          badge: "bg-blue-100 text-blue-800 border-blue-300",
+          color: "text-blue-600 dark:text-blue-400",
+          bgColor: "bg-blue-50/50 dark:bg-blue-950/20",
+          badge:
+            "bg-blue-100/80 text-blue-800 border-blue-300/50 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-700/50",
         };
       case "response":
         return {
           icon: "✅",
-          color: "text-green-600",
-          bgColor: "bg-green-50",
-          badge: "bg-green-100 text-green-800 border-green-300",
+          color: "text-green-600 dark:text-green-400",
+          bgColor: "bg-green-50/50 dark:bg-green-950/20",
+          badge:
+            "bg-green-100/80 text-green-800 border-green-300/50 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700/50",
         };
       case "hardware":
         return {
           icon: "🔗",
-          color: "text-blue-600",
-          bgColor: "bg-blue-50",
-          badge: "bg-blue-100 text-blue-800 border-blue-300",
+          color: "text-blue-600 dark:text-blue-400",
+          bgColor: "bg-blue-50/50 dark:bg-blue-950/20",
+          badge:
+            "bg-blue-100/80 text-blue-800 border-blue-300/50 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-700/50",
         };
       case "error":
         return {
           icon: "❌",
-          color: "text-red-600",
-          bgColor: "bg-red-50",
-          badge: "bg-red-100 text-red-800 border-red-300",
+          color: "text-red-600 dark:text-red-400",
+          bgColor: "bg-red-50/50 dark:bg-red-950/20",
+          badge:
+            "bg-red-100/80 text-red-800 border-red-300/50 dark:bg-red-900/50 dark:text-red-300 dark:border-red-700/50",
         };
       default:
         return {
           icon: "ℹ️",
-          color: "text-gray-600",
-          bgColor: "bg-gray-50",
-          badge: "bg-gray-100 text-gray-800 border-gray-300",
+          color: "text-muted-foreground",
+          bgColor: "bg-muted/20",
+          badge: "bg-muted text-muted-foreground border-border",
         };
     }
   };
@@ -293,7 +297,7 @@ const ExecutionPanel: React.FC<ExecutionPanelProps> = ({
                           )}
 
                           {log.content && (
-                            <pre className="text-xs bg-background/50 p-2 rounded border overflow-x-auto">
+                            <pre className="text-xs bg-muted/30 dark:bg-muted/10 p-2 rounded border border-border/50 overflow-x-auto text-foreground">
                               {typeof log.content === "string"
                                 ? log.content
                                 : JSON.stringify(log.content, null, 2)}

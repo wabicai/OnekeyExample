@@ -24,7 +24,7 @@ const buttonVariants = cva(
         success:
           "bg-emerald-500 text-white shadow-lg hover:bg-emerald-600 hover:shadow-xl hover:scale-105 active:scale-95",
         elegant:
-          "from-white to-gray-50 border border-gray-200 text-gray-800 shadow hover:shadow-lg hover:border-gray-300 hover:bg-gray-50",
+          "bg-card border border-border text-foreground shadow hover:bg-muted hover:shadow-lg hover:border-border/70",
       },
       size: {
         default: "h-10 px-6 py-2",
