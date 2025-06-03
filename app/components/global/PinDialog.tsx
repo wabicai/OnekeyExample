@@ -132,7 +132,7 @@ const PinDialog: React.FC<PinDialogProps> = ({ isOpen, onClose }) => {
             {/* 删除按钮 - 整个键盘左下角 */}
             <Button
               variant="ghost"
-              className="h-14 rounded-none rounded-bl-lg bg-red-500 hover:bg-red-600 text-white transition-all duration-150"
+              className="h-14 rounded-none rounded-bl-lg bg-gray-500 hover:bg-gray-600 text-white transition-all duration-150"
               onClick={handleBackspace}
               disabled={pin.length === 0}
               title="删除最后一位数字"

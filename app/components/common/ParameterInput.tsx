@@ -148,7 +148,7 @@ const ParameterInput: React.FC<ParameterInputProps> = ({
       className="text-sm font-medium text-foreground cursor-pointer flex items-center gap-2"
     >
       {field.label || field.name}
-      {field.required && <span className="text-destructive">*</span>}
+      {field.required && <span className="text-orange-600">*</span>}
     </label>
   );
 
@@ -187,7 +187,7 @@ const ParameterInput: React.FC<ParameterInputProps> = ({
                 }`}
               >
                 {field.label || field.name}
-                {field.required && <span className="text-destructive">*</span>}
+                {field.required && <span className="text-orange-600">*</span>}
               </label>
               <p
                 className={`text-xs ${
@@ -343,7 +343,7 @@ const ParameterInput: React.FC<ParameterInputProps> = ({
         <CardTitle className="flex items-center justify-between text-sm">
           <span className="text-foreground">执行参数</span>
           {methodConfig.dangerous && (
-            <Badge variant="destructive" className="text-xs">
+            <Badge variant="warning" className="text-xs">
               危险操作
             </Badge>
           )}

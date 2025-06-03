@@ -25,19 +25,18 @@ const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
   const { t } = useTranslation();
   const [passphrase, setPassphrase] = useState("");
   const [confirmPassphrase, setConfirmPassphrase] = useState("");
-  const [passphraseOnDevice, setPassphraseOnDevice] = useState(false);
   const [savePassphrase, setSavePassphrase] = useState(true);
   const [showPassphrase, setShowPassphrase] = useState(false);
 
   const handleSubmit = async () => {
-    // 如果不是设备输入，验证两次输入是否一致
-    if (!passphraseOnDevice && passphrase !== confirmPassphrase) {
+    // 验证两次输入是否一致
+    if (passphrase !== confirmPassphrase) {
       // TODO: 可以添加toast提示
       return;
     }
 
     try {
-      await submitPassphrase(passphrase, passphraseOnDevice, savePassphrase);
+      await submitPassphrase(passphrase, false, savePassphrase);
 
       resetState();
       onClose();
@@ -70,7 +69,6 @@ const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
   const resetState = () => {
     setPassphrase("");
     setConfirmPassphrase("");
-    setPassphraseOnDevice(false);
     setSavePassphrase(true);
     setShowPassphrase(false);
   };
@@ -82,16 +80,7 @@ const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
     }
   }, [isOpen]);
 
-  // 当选择设备输入时重置密码输入
-  useEffect(() => {
-    if (passphraseOnDevice) {
-      setPassphrase("");
-      setConfirmPassphrase("");
-    }
-  }, [passphraseOnDevice]);
-
-  const isFormValid =
-    passphraseOnDevice || (passphrase && passphrase === confirmPassphrase);
+  const isFormValid = passphrase && passphrase === confirmPassphrase;
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
@@ -106,15 +95,10 @@ const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
             {t("passphrase.title", "输入 Passphrase")}
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
-            {passphraseOnDevice
-              ? t(
-                  "passphrase.deviceInputDescription",
-                  "将在设备上安全输入passphrase"
-                )
-              : t(
-                  "passphrase.webInputDescription",
-                  "在网页上输入passphrase以继续"
-                )}
+            {t(
+              "passphrase.webInputDescription",
+              "在网页上输入passphrase以继续"
+            )}
           </DialogDescription>
         </div>
 
@@ -140,14 +124,9 @@ const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
                 id="passphrase-input"
                 name="device-passphrase"
                 type={showPassphrase ? "text" : "password"}
-                placeholder={
-                  passphraseOnDevice
-                    ? ""
-                    : t("passphrase.placeholder", "请输入passphrase")
-                }
+                placeholder={t("passphrase.placeholder", "请输入passphrase")}
                 value={passphrase}
                 onChange={(e) => setPassphrase(e.target.value)}
-                disabled={passphraseOnDevice}
                 className="h-10 pr-10"
                 maxLength={50}
                 autoComplete="off"
@@ -155,66 +134,62 @@ const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
                 data-form-type="other"
                 spellCheck="false"
               />
-              {!passphraseOnDevice && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-                  onClick={() => setShowPassphrase(!showPassphrase)}
-                >
-                  {showPassphrase ? (
-                    <EyeOff className="h-3 w-3" />
-                  ) : (
-                    <Eye className="h-3 w-3" />
-                  )}
-                </Button>
-              )}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                onClick={() => setShowPassphrase(!showPassphrase)}
+              >
+                {showPassphrase ? (
+                  <EyeOff className="h-3 w-3" />
+                ) : (
+                  <Eye className="h-3 w-3" />
+                )}
+              </Button>
             </div>
           </div>
 
-          {/* 确认 Passphrase - 只在web输入时显示 */}
-          {!passphraseOnDevice && (
-            <div className="space-y-2">
-              <label
-                htmlFor="confirm-passphrase"
-                className="text-sm font-medium text-foreground"
+          {/* 确认 Passphrase */}
+          <div className="space-y-2">
+            <label
+              htmlFor="confirm-passphrase"
+              className="text-sm font-medium text-foreground"
+            >
+              {t("passphrase.confirmPassphrase", "确认 passphrase")}
+            </label>
+            <div className="relative">
+              <Input
+                id="confirm-passphrase"
+                name="device-passphrase-confirm"
+                type={showPassphrase ? "text" : "password"}
+                placeholder={t(
+                  "passphrase.confirmPlaceholder",
+                  "请再次输入passphrase"
+                )}
+                value={confirmPassphrase}
+                onChange={(e) => setConfirmPassphrase(e.target.value)}
+                className="h-10 pr-10"
+                autoComplete="off"
+                data-1p-ignore="true"
+                data-form-type="other"
+                spellCheck="false"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                onClick={() => setShowPassphrase(!showPassphrase)}
               >
-                {t("passphrase.confirmPassphrase", "确认 passphrase")}
-              </label>
-              <div className="relative">
-                <Input
-                  id="confirm-passphrase"
-                  name="device-passphrase-confirm"
-                  type={showPassphrase ? "text" : "password"}
-                  placeholder={t(
-                    "passphrase.confirmPlaceholder",
-                    "请再次输入passphrase"
-                  )}
-                  value={confirmPassphrase}
-                  onChange={(e) => setConfirmPassphrase(e.target.value)}
-                  className="h-10 pr-10"
-                  autoComplete="off"
-                  data-1p-ignore="true"
-                  data-form-type="other"
-                  spellCheck="false"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-                  onClick={() => setShowPassphrase(!showPassphrase)}
-                >
-                  {showPassphrase ? (
-                    <EyeOff className="h-3 w-3" />
-                  ) : (
-                    <Eye className="h-3 w-3" />
-                  )}
-                </Button>
-              </div>
+                {showPassphrase ? (
+                  <EyeOff className="h-3 w-3" />
+                ) : (
+                  <Eye className="h-3 w-3" />
+                )}
+              </Button>
             </div>
-          )}
+          </div>
 
           {/* 保存选项  */}
           <div className="flex items-center space-x-2 pt-1">
@@ -235,33 +210,27 @@ const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
           <div className="space-y-2 pt-3">
             {/* 主要操作按钮 */}
             <Button
-              onClick={passphraseOnDevice ? handleUseDevice : handleSubmit}
+              onClick={handleSubmit}
               disabled={!isFormValid}
               className="w-full h-10 bg-gray-800 hover:bg-gray-700 text-white"
             >
-              {passphraseOnDevice
-                ? t("passphrase.useDevice", "在设备上输入")
-                : t("common.confirm", "确认")}
+              {t("common.confirm", "确认")}
             </Button>
 
             {/* 次要操作 - 合并为一行 */}
             <div className="flex space-x-2">
-              {!passphraseOnDevice && (
-                <Button
-                  variant="outline"
-                  onClick={() => setPassphraseOnDevice(true)}
-                  className="flex-1 h-10 text-gray-600 border-gray-300 text-sm"
-                >
-                  {t("passphrase.inputOnDevice", "在设备上输入")}
-                </Button>
-              )}
+              <Button
+                variant="outline"
+                onClick={handleUseDevice}
+                className="flex-1 h-10 text-gray-600 border-gray-300 text-sm"
+              >
+                {t("passphrase.inputOnDevice", "在设备上输入")}
+              </Button>
 
               <Button
                 variant="ghost"
                 onClick={handleCancel}
-                className={`h-10 text-gray-500 hover:text-gray-700 text-sm ${
-                  passphraseOnDevice ? "w-full" : "flex-1"
-                }`}
+                className="flex-1 h-10 text-gray-500 hover:text-gray-700 text-sm"
               >
                 {t("common.cancel", "取消")}
               </Button>

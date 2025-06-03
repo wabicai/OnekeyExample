@@ -31,6 +31,7 @@ interface DeviceInteractionAreaProps {
   deviceTheme: ThemeType;
   onExecute: () => void;
   onReset: () => void;
+  isCancelling?: boolean;
 }
 
 const DeviceInteractionArea: React.FC<DeviceInteractionAreaProps> = ({
@@ -40,6 +41,7 @@ const DeviceInteractionArea: React.FC<DeviceInteractionAreaProps> = ({
   deviceTheme,
   onExecute,
   onReset,
+  isCancelling = false,
 }) => {
   // 获取状态配置
   const getStatusConfig = () => {
@@ -165,15 +167,24 @@ const DeviceInteractionArea: React.FC<DeviceInteractionAreaProps> = ({
                   : "outline"
               }
               onClick={onReset}
-              disabled={status === "idle"}
+              disabled={status === "idle" || status === "error" || isCancelling}
               className={
                 status === "loading" || status === "device-interaction"
                   ? "h-11 text-sm flex items-center gap-2"
                   : "border-border text-foreground hover:bg-muted h-11 text-sm flex items-center gap-2"
               }
             >
-              <RotateCcw className="h-4 w-4" />
-              <span>取消</span>
+              {isCancelling ? (
+                <>
+                  <Clock className="h-4 w-4 animate-spin" />
+                  <span>取消中</span>
+                </>
+              ) : (
+                <>
+                  <RotateCcw className="h-4 w-4" />
+                  <span>取消</span>
+                </>
+              )}
             </Button>
           </div>
         </div>

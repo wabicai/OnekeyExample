@@ -142,11 +142,11 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
 
             {error && (
               <Alert
-                variant="destructive"
-                className="border-destructive/50 bg-destructive/5"
+                variant="warning"
+                className="border-orange-200 bg-orange-50"
               >
                 <X className="h-4 w-4" />
-                <AlertDescription className="text-destructive">
+                <AlertDescription className="text-orange-800">
                   {error}
                 </AlertDescription>
               </Alert>

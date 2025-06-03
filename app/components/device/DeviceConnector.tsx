@@ -298,7 +298,7 @@ const DeviceConnector: React.FC = () => {
 
           {/* Error Display */}
           {error && (
-            <Alert variant="destructive">
+            <Alert variant="warning">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
             </Alert>

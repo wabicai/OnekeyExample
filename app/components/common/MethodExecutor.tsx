@@ -66,6 +66,7 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
     deviceInfo?: unknown;
   } | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   // 获取方法的所有参数，从预设中推断（因为新的 MethodConfig 没有 parameters 字段）
   const getAllParametersFromPresets = (): Array<{
@@ -157,6 +158,13 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
         deviceInfo: globalDeviceAction.deviceInfo,
       });
     } else if (!globalDeviceAction.isActive) {
+      // 设备动作被清除
+      if (status === "device-interaction") {
+        // 如果当前正在设备交互中，说明可能是PIN错误或操作被取消
+        console.log("⚠️ [MethodExecutor] 设备交互被中断，重置状态到错误");
+        setStatus("error");
+        setError("操作被中断或PIN输入错误");
+      }
       setLocalDeviceAction(null);
     }
   }, [globalDeviceAction, status]);
@@ -189,7 +197,7 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
         toast({
           title: "参数错误",
           description: `参数 "${param.name}" 是必需的`,
-          variant: "destructive",
+          variant: "warning",
         });
         return false;
       }
@@ -206,7 +214,7 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
       toast({
         title: "设备未连接",
         description: "请先连接硬件设备",
-        variant: "destructive",
+        variant: "warning",
       });
       return;
     }
@@ -216,7 +224,7 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
       toast({
         title: "SDK未就绪",
         description: "请等待SDK初始化完成",
-        variant: "destructive",
+        variant: "warning",
       });
       return;
     }
@@ -269,7 +277,7 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
       toast({
         title: "执行失败",
         description: errorMessage,
-        variant: "destructive",
+        variant: "warning",
       });
 
       onError?.(errorMessage);
@@ -280,6 +288,7 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
   const handleReset = async () => {
     // 如果正在执行中或设备交互中，调用SDK的cancel方法
     if (status === "loading" || status === "device-interaction") {
+      setIsCancelling(true);
       try {
         if (currentDevice) {
           console.log("[MethodExecutor] 🚫 取消硬件操作");
@@ -312,6 +321,8 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
           description: "正在尝试停止当前操作",
           variant: "default",
         });
+      } finally {
+        setIsCancelling(false);
       }
     }
 
@@ -345,7 +356,7 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
         toast({
           title: "复制失败",
           description: "无法复制到剪贴板",
-          variant: "destructive",
+          variant: "warning",
         });
       }
     }
@@ -396,6 +407,7 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
               deviceTheme={getDeviceTheme()}
               onExecute={executeMethod}
               onReset={handleReset}
+              isCancelling={isCancelling}
             />
           </div>
 
@@ -469,13 +481,18 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
 
                 {error && (
                   <div className="space-y-3">
-                    <Badge variant="destructive">失败</Badge>
+                    <Badge
+                      variant="secondary"
+                      className="bg-orange-100 text-orange-700 border-orange-300"
+                    >
+                      失败
+                    </Badge>
                     <Alert
-                      variant="destructive"
-                      className="border-destructive/50 bg-destructive/5"
+                      variant="warning"
+                      className="border-orange-200 bg-orange-50"
                     >
                       <AlertTriangle className="h-4 w-4" />
-                      <AlertDescription className="text-destructive">
+                      <AlertDescription className="text-orange-800">
                         {error}
                       </AlertDescription>
                     </Alert>
@@ -530,7 +547,7 @@ const MethodExecutor: React.FC<MethodExecutorProps> = ({
             </Button>
             <Button
               onClick={performExecution}
-              variant={methodConfig.deprecated ? "destructive" : "default"}
+              variant={methodConfig.deprecated ? "warning" : "default"}
               className={
                 methodConfig.deprecated
                   ? ""

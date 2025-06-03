@@ -157,13 +157,23 @@ export const SDKProvider: React.FC<SDKProviderProps> = ({ children }) => {
           // 用户确认事件，不需要弹窗
           break;
 
-        case "ui-close_window":
+        case "ui-close_window": {
           console.log("[SDKProvider] 🚪 关闭所有弹窗");
+          // 检查当前是否有活跃的设备动作，如果有可能是因为错误导致的关闭
+          const currentDeviceAction = useDeviceStore.getState().deviceAction;
+          if (currentDeviceAction.isActive) {
+            console.log(
+              "[SDKProvider] ⚠️ 设备动作被意外中断，可能由于错误",
+              currentDeviceAction
+            );
+          }
+
           // 关闭所有弹窗
           if (window.globalDialogManager) {
             window.globalDialogManager.closeAllDialogs();
           }
           break;
+        }
 
         default:
           console.log(`[SDKProvider] ❓ 未知事件类型: ${message.type}`);

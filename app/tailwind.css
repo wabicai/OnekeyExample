@@ -40,7 +40,7 @@ body {
     --accent: var(--ok-green-accent);
     --accent-foreground: 0 0% 98%; /* Light text on dark green */
     
-    --destructive: 0 84% 60%;
+    --destructive: 220 9% 46%; /* gray-600 */
     --destructive-foreground: 0 0% 100%;
     
     --border: 220 13% 88%; /* gray-300 adjusted */
@@ -94,7 +94,7 @@ body {
     --accent: var(--ok-green-accent);
     --accent-foreground: 0 0% 98%;    /* Light text on dark green */
     
-    --destructive: 0 72% 51%; /* Slightly darker red for dark mode */
+    --destructive: 220 13% 41%; /* gray-600 adjusted for dark mode */
     --destructive-foreground: 0 0% 98%;
     
     --border: 224 8% 30%;      /* gray-700 slightly lighter for borders */

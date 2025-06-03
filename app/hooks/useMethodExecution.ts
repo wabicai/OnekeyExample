@@ -15,78 +15,90 @@ export function useMethodExecution(options: UseMethodExecutionOptions = {}) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { currentDevice } = useDeviceStore();
-  
-  const [selectedMethod, setSelectedMethod] = useState<MethodConfig | null>(null);
+
+  const [selectedMethod, setSelectedMethod] = useState<MethodConfig | null>(
+    null
+  );
   const [isExecuting, setIsExecuting] = useState(false);
 
-  const selectMethod = useCallback((method: MethodConfig, chainId?: string) => {
-    setSelectedMethod(method);
-    const path = chainId 
-      ? `${basePath}/${chainId}/${method.method}`
-      : `${basePath}/${method.method}`;
-    navigate(path);
-  }, [navigate, basePath]);
+  const selectMethod = useCallback(
+    (method: MethodConfig, chainId?: string) => {
+      setSelectedMethod(method);
+      const path = chainId
+        ? `${basePath}/${chainId}/${method.method}`
+        : `${basePath}/${method.method}`;
+      navigate(path);
+    },
+    [navigate, basePath]
+  );
 
-  const executeMethod = useCallback(async (
-    params: Record<string, unknown>,
-    methodConfig?: MethodConfig
-  ): Promise<ExecutionResult> => {
-    const method = methodConfig || selectedMethod;
-    
-    if (!method) {
-      throw new Error("未选择方法");
-    }
+  const executeMethod = useCallback(
+    async (
+      params: Record<string, unknown>,
+      methodConfig?: MethodConfig
+    ): Promise<ExecutionResult> => {
+      const method = methodConfig || selectedMethod;
 
-    if (requireDevice && !currentDevice) {
-      throw new Error("设备未连接");
-    }
+      if (!method) {
+        throw new Error("未选择方法");
+      }
 
-    setIsExecuting(true);
-    const startTime = Date.now();
-    
-    try {
-      const executionParams = requireDevice && currentDevice ? {
-        connectId: currentDevice.connectId,
-        deviceId: currentDevice.deviceId,
-        ...params,
-      } : params;
+      if (requireDevice && !currentDevice) {
+        throw new Error("设备未连接");
+      }
 
-      const result = await callHardwareAPI(method.method, executionParams);
-      const duration = Date.now() - startTime;
-      
-      if (result.success) {
+      setIsExecuting(true);
+      const startTime = Date.now();
+
+      try {
+        const executionParams =
+          requireDevice && currentDevice
+            ? {
+                connectId: currentDevice.connectId,
+                deviceId: currentDevice.deviceId,
+                ...params,
+              }
+            : params;
+
+        const result = await callHardwareAPI(method.method, executionParams);
+        const duration = Date.now() - startTime;
+
+        if (result.success) {
+          toast({
+            title: "执行成功",
+            description: `方法 ${method.name} 执行完成`,
+          });
+
+          return {
+            success: true,
+            data: result.payload,
+            duration,
+          };
+        } else {
+          throw new Error(result.payload?.error || "执行失败");
+        }
+      } catch (error) {
+        const duration = Date.now() - startTime;
+        const errorMessage =
+          error instanceof Error ? error.message : "执行失败";
+
         toast({
-          title: "执行成功",
-          description: `方法 ${method.name} 执行完成`,
+          title: "执行失败",
+          description: errorMessage,
+          variant: "warning",
         });
-        
+
         return {
-          success: true,
-          data: result.payload,
+          success: false,
+          error: errorMessage,
           duration,
         };
-      } else {
-        throw new Error(result.payload?.error || "执行失败");
+      } finally {
+        setIsExecuting(false);
       }
-    } catch (error) {
-      const duration = Date.now() - startTime;
-      const errorMessage = error instanceof Error ? error.message : "执行失败";
-      
-      toast({
-        title: "执行失败",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      
-      return {
-        success: false,
-        error: errorMessage,
-        duration,
-      };
-    } finally {
-      setIsExecuting(false);
-    }
-  }, [selectedMethod, currentDevice, requireDevice, toast]);
+    },
+    [selectedMethod, currentDevice, requireDevice, toast]
+  );
 
   const clearSelection = useCallback(() => {
     setSelectedMethod(null);
@@ -100,4 +112,4 @@ export function useMethodExecution(options: UseMethodExecutionOptions = {}) {
     clearSelection,
     canExecute: !requireDevice || !!currentDevice,
   };
-} 
+}

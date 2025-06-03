@@ -190,7 +190,7 @@ const LogDisplay: React.FC<LogDisplayProps> = ({
                 size="sm"
                 onClick={handleClearLogs}
                 disabled={logs.length === 0}
-                className="bg-background border-border text-foreground hover:bg-destructive/5 hover:text-destructive hover:border-destructive/30"
+                className="bg-background border-border text-foreground hover:bg-muted hover:text-muted-foreground hover:border-border/70"
               >
                 <Trash2 className="h-3 w-3 mr-1.5" />
                 {t("logDisplay.clear")}

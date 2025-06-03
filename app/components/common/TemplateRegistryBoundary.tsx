@@ -65,9 +65,9 @@ export const TemplateRegistryBoundary: React.FC<
     return (
       <PageLayout>
         <div className="flex items-center justify-center min-h-96">
-          <Card className="bg-card border border-destructive/50">
-            <CardContent className="p-8 text-center">
-              <h3 className="text-lg font-semibold text-destructive mb-2">
+          <Card className="bg-card border border-orange-200">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-orange-800 mb-2">
                 {t("common.loadError")}
               </h3>
               <p className="text-muted-foreground">{error}</p>
@@ -83,9 +83,9 @@ export const TemplateRegistryBoundary: React.FC<
     return (
       <PageLayout>
         <div className="flex items-center justify-center min-h-96">
-          <Card className="bg-card border border-destructive/50">
-            <CardContent className="p-8 text-center">
-              <h3 className="text-lg font-semibold text-destructive mb-2">
+          <Card className="bg-card border border-orange-200">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-orange-800 mb-2">
                 {notFoundTitle}
               </h3>
               <p className="text-muted-foreground">{notFoundMessage}</p>

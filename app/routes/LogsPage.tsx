@@ -62,7 +62,7 @@ const LogsPage: React.FC = () => {
                 size="sm"
                 onClick={clearLogs}
                 disabled={logs.length === 0}
-                className="bg-background border-border text-foreground hover:bg-destructive/5 hover:text-destructive hover:border-destructive/30 disabled:opacity-50"
+                className="bg-background border-border text-foreground hover:bg-muted hover:text-muted-foreground hover:border-border/70 disabled:opacity-50"
               >
                 <Trash2 className="h-3 w-3 mr-1.5" />
                 {t("logs.clear")}
